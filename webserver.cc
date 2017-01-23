@@ -11,8 +11,25 @@ using namespace boost;
 using namespace boost::system;
 using namespace boost::asio;
 
+
+
+void accept_and_run(ip::tcp::acceptor& acceptor, io_service& io_service)
+{
+   std::shared_ptr<session> sesh = std::make_shared<session>(io_service);
+   acceptor.async_accept(sesh->socket, [sesh, &acceptor, &io_service](const error_code& accept_error)
+   {
+      accept_and_run(acceptor, io_service);
+      if(!accept_error)
+      {
+         session::interact(sesh);
+      }
+   });
+}
+
 int main(int argc, const char * argv[])
 {
+   short unsigned int port;
+  
    try {
      if (argc != 2)
      {
@@ -21,8 +38,6 @@ int main(int argc, const char * argv[])
      }
      NginxConfigParser config_parser;
      NginxConfig config_out;
-
-     int port;
 
      if (config_parser.Parse(argv[1], &config_out)) {
         port = std::stoi(config_out.statements_[0]->tokens_[1]);
@@ -42,8 +57,8 @@ int main(int argc, const char * argv[])
    ip::tcp::endpoint endpoint{ip::tcp::v4(), port};
    ip::tcp::acceptor acceptor{io_service, endpoint};
    
-   //acceptor.listen();
-   //accept_and_run(acceptor, io_service);
+   acceptor.listen();
+   accept_and_run(acceptor, io_service);
    
    io_service.run();
    return 0;
