@@ -6,19 +6,20 @@
 #include <cstdlib>
 #include "config_parser.h"
 #include <utility>
+#include "request_handle.h"
 
 using namespace boost;
 using namespace boost::system;
 using namespace boost::asio;
 
+class session;
 
-
-void accept_and_run(ip::tcp::acceptor& acceptor, io_service& io_service)
+void server(ip::tcp::acceptor& acceptor, io_service& io_service)
 {
    std::shared_ptr<session> sesh = std::make_shared<session>(io_service);
    acceptor.async_accept(sesh->socket, [sesh, &acceptor, &io_service](const error_code& accept_error)
    {
-      accept_and_run(acceptor, io_service);
+      server(acceptor, io_service);
       if(!accept_error)
       {
          session::interact(sesh);
@@ -58,7 +59,7 @@ int main(int argc, const char * argv[])
    ip::tcp::acceptor acceptor{io_service, endpoint};
    
    acceptor.listen();
-   accept_and_run(acceptor, io_service);
+   server(acceptor, io_service);
    
    io_service.run();
    return 0;
