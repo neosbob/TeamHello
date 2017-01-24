@@ -22,7 +22,7 @@ void server(ip::tcp::acceptor& acceptor, io_service& io_service)
       server(acceptor, io_service);
       if(!accept_error)
       {
-         session::interact(sesh);
+         session::read_request(sesh);
       }
    });
 }

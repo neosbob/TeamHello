@@ -42,7 +42,7 @@ public:
    {
    }
    
-   static void interact(std::shared_ptr<session> pThis);
+   static void read_request(std::shared_ptr<session> pThis);
 };
 
 

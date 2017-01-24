@@ -27,9 +27,9 @@ public:
    
    int content_length();
    
-   void on_read_header(std::string line);
+   void read_header(std::string line);
    
-   void on_read_request_line(std::string line);
+   void read_request_line(std::string line);
 };
 
 #endif // REPLY_H
