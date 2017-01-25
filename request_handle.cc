@@ -56,7 +56,7 @@ void session::read_next_line(std::shared_ptr<session> pThis)
                std::shared_ptr<std::string> str = std::make_shared<std::string>(pThis->headers.get_response(echoback));
                asio::async_write(pThis->socket, boost::asio::buffer(str->c_str(), str->length()), [pThis, str](const error_code& e, std::size_t s)
                {
-                  std::cout << "done" << std::endl;
+                  //std::cout << "done" << std::endl;
                });
             }
          }
@@ -72,7 +72,7 @@ void session::read_first_line(std::shared_ptr<session> pThis)
 
          std::getline(stream, line, '\r');
          std::getline(stream, ignore, '\n');
-         pThis->headers.read_request_line(line);
+         //pThis->headers.read_request_line(line);
          pThis->ss += line + "\r\n";
          pThis->read_next_line(pThis);
       });
