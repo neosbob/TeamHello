@@ -26,7 +26,8 @@ std::string http_headers::get_response(std::string echoback)
          ssOut << "HTTP/1.1 200 OK" << std::endl;
          ssOut << "content-type: text/plain" << std::endl;
          ssOut << "content-length: " << sHTML.length() << std::endl;
-         ssOut << std::endl;
+         ssOut << std::endl; //\r\n\r\n signals for end of response header.
+         //Below is the body of the response.
          ssOut << sHTML;
       //}
 /*
