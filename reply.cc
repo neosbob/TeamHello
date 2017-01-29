@@ -59,7 +59,7 @@ int http_headers::content_length()
       }
    }
    
-void http_headers::read_header(std::string line)
+std::string http_headers::read_header(std::string line)
    {  
       //only applies for lines after the first line
       //Maps specific headers to a certain value
@@ -72,6 +72,8 @@ void http_headers::read_header(std::string line)
       std::string value;
       std::getline(ssHeader, value);
       headers[headerName] = value;
+	
+	return headerName+":"+value;	
    }
    
 void http_headers::read_request_line(std::string line)
