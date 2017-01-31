@@ -88,3 +88,12 @@ std::string http_headers::read_request_line(std::string line)
       std::cout << "request for resource: " << url << std::endl;
       return url;
    }
+
+bool http_headers::setMap(std::map<std::string, std::string> m)
+{
+	headers=m;
+	if (headers.empty()) 
+		return false;
+	else
+		return true;
+}
