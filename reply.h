@@ -31,6 +31,8 @@ public:
    
    std::string read_request_line(std::string line);
 
+   bool setMap(std::map<std::string, std::string> m);
+
    
 };
 
