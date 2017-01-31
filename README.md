@@ -14,7 +14,7 @@ git clone https://github.com/UCLA-CS130/TeamHello.git
 
 make 
 
-./webserver <config file>
+./webserver SimpleConfig
 
 # Run Integration Test:
 
