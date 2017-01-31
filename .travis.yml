@@ -1,6 +1,6 @@
 language: cpp
 script: make
 addons:
-	apt:
-		packages:
-		- libboost-all-dev 
+  apt:
+     packages:
+             - libboost-all-dev 
