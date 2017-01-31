@@ -27,3 +27,12 @@ TEST(ReplyTest, ReadHeader)
 	EXPECT_EQ(header_value,"content-type: text/plain");
 	
 }
+
+TEST(ReplyTest, ReadReqLine)
+{
+	http_headers h;
+	std::string line = "GET /www HTTP/1.1";
+	std::string url = h.read_request_line(line);
+	EXPECT_EQ("/www", url);
+
+}

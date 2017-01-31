@@ -29,7 +29,9 @@ public:
    
    std::string read_header(std::string line);
    
-   void read_request_line(std::string line);
+   std::string read_request_line(std::string line);
+
+   
 };
 
 #endif // REPLY_H
