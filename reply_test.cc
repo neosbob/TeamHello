@@ -36,3 +36,26 @@ TEST(ReplyTest, ReadReqLine)
 	EXPECT_EQ("/www", url);
 
 }
+
+TEST(ReplyTest, ContentLen)
+{
+	std::map<std::string, std::string> header;
+	http_headers h;
+	header["content-type"]="plain";
+	header["content-length"]="20";
+	h.setMap(header);
+	int c_len = h.content_length();
+	EXPECT_EQ(20,c_len);
+	
+
+}
+
+TEST(ReplyTest, SetMap)
+{
+	std::map<std::string, std::string> header;
+	http_headers h;
+	header["content-type"]="plain";
+	header["content-length"]="20";
+	bool val = h.setMap(header);
+	EXPECT_TRUE(val);
+}
