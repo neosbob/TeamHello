@@ -76,7 +76,7 @@ std::string http_headers::read_header(std::string line)
 	return headerName+":"+value;	
    }
    
-void http_headers::read_request_line(std::string line)
+std::string http_headers::read_request_line(std::string line)
    {
       //This is a check for what url the request wants.
 
@@ -86,4 +86,5 @@ void http_headers::read_request_line(std::string line)
       ssRequestLine >> version;
       
       std::cout << "request for resource: " << url << std::endl;
+      return url;
    }
