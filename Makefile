@@ -4,7 +4,7 @@ CXXFLAGS= -g -Wall -pthread -std=c++0x $(CXXOPTIMIZE)
 GTEST_DIR=googletest/googletest
 SERVERCLASSES=config_parser.cc
 
-default:  config_parser config_parser_test reply_test webserver reply.o request_handle.o 
+default:  config_parser config_parser_test webserver_test reply_test webserver reply.o request_handle.o 
 
 reply_test: 
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
