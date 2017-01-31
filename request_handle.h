@@ -40,12 +40,13 @@ public:
 
    size_t length;
 
-   std::string ss = "";
+   std::string ss;
 
    ip::tcp::socket socket;
    
    session(io_service& io_service)
       :socket(io_service)
+      , ss("")
    {
    }
    
