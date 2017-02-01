@@ -35,8 +35,21 @@ webserver_test:
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread webserver_test.cc webserver.cc config_parser.cc reply.cc request_handle.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o webserver_test -lboost_system
 
 clean:
-	rm -rf *.o *~ *.gch *.swp *.dSYM config_parser config_parser_test *.tar.gz webserver reply.o request_handle.o reply_test webserver_test
+	rm -rf *.o *~ *.gch *.swp *.dSYM *.gcda *.gcno *.gcov config_parser config_parser_test *.tar.gz webserver reply.o request_handle.o reply_test webserver_test
 
-
+test: clean default
+	./reply_test
+	./webserver_test
+	
+test_coverage:
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
+	ar -rv libgtest.a gtest-all.o
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread reply_test.cc reply.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o reply_test -lboost_system -fprofile-arcs -ftest-coverage
+	./reply_test; gcov -r reply.cc
+	
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
+	ar -rv libgtest.a gtest-all.o
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread webserver_test.cc webserver.cc config_parser.cc reply.cc request_handle.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o webserver_test -lboost_system -fprofile-arcs -ftest-coverage
+	./webserver_test; gcov -r webserver.cc
 
 
