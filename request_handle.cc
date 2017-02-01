@@ -32,12 +32,9 @@ void session::read_next_line(std::shared_ptr<session> pThis)
          std::string line, ignore;
          std::istream stream {&pThis->buff};
 
-         std::getline(stream, line, '\r');
-         std::getline(stream, ignore, '\n');
-         pThis->headers.read_header(line);
-         pThis->ss += line + "\r\n";
-         std::string echoback = pThis->ss;
-         
+         pThis->ss += pThis->read_next_line_text(stream, line, ignore);
+	 pThis->headers.read_header(line);
+	 std::string echoback = pThis->ss;
          
          if(line.length() != 0)
          {
@@ -56,33 +53,52 @@ void session::read_next_line(std::shared_ptr<session> pThis)
                std::shared_ptr<std::string> str = std::make_shared<std::string>(pThis->headers.get_response(echoback));
                asio::async_write(pThis->socket, boost::asio::buffer(str->c_str(), str->length()), [pThis, str](const error_code& e, std::size_t s)
                {
-                  //std::cout << "done" << std::endl;
+                  //return str->c_str();
                });
             }
          }
       });
    }
-   
+
+std::string session::read_next_line_text(std::istream & stream, std::string & line, std::string & ignore)
+   {
+      	std::getline(stream, line, '\r');
+        std::getline(stream, ignore, '\n');
+        
+        std::string current_line;
+	current_line += line + "\r\n";      
+
+	return current_line; 
+   }
+
 void session::read_first_line(std::shared_ptr<session> pThis)
    {
       asio::async_read_until(pThis->socket, pThis->buff, '\r', [pThis](const error_code& e, std::size_t s)
       {
          std::string line, ignore;
          std::istream stream {&pThis->buff};
-
-         std::getline(stream, line, '\r');
-         std::getline(stream, ignore, '\n');
-         //pThis->headers.read_request_line(line);
-         pThis->ss += line + "\r\n";
+ 
+	 pThis->ss += pThis->read_first_line_text(stream, line, ignore);
          pThis->read_next_line(pThis);
       });
       
+   }
+
+std::string session::read_first_line_text(std::istream & stream, std::string & line, std::string & ignore)
+   {
+      	std::getline(stream, line, '\r');
+        std::getline(stream, ignore, '\n');
+        //pThis->headers.read_request_line(line);
+        std::string first_line;
+        first_line += line + "\r\n";
+
+	return first_line; 
    }
    
 
    
 void session::read_request(std::shared_ptr<session> pThis)
    {
-      read_first_line(pThis);
+      pThis->read_first_line(pThis);
    }
 
