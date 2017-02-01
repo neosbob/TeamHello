@@ -59,7 +59,7 @@ TEST_F(RequestTest, read_first_line_text)
 
 
 
-/*
+
 TEST_F(RequestTest, read_request)
 {
 	io_service io_service;
@@ -71,14 +71,56 @@ TEST_F(RequestTest, read_request)
 
 	char data[] = "Hello\r\n";
 
+	//doesn't really write to socket since it is on same side as read.
         asio::async_write(sesh->socket, asio::buffer(data, 7) ,[sesh](const error_code& e, std::size_t s)
       	{ });
 
 	sesh->read_request(sesh);	
 
-
-	EXPECT_EQ(sesh->ss, "Hello\r\n");
+	//Since socket is empty, string ss is not augmented
+	EXPECT_EQ(sesh->ss, "");
 }
 
-*/
+TEST_F(RequestTest, read_first_line)
+{
+	io_service io_service;
+   	ip::tcp::endpoint endpoint{ip::tcp::v4(), 8080};
+   	ip::tcp::acceptor acceptor{io_service, endpoint};
+        std::shared_ptr<session> sesh = std::make_shared<session>(io_service);
+
+	io_service.run();
+
+	char data[] = "Hello\r\n";
+
+	//doesn't really write to socket since it is on same side as read.
+        asio::async_write(sesh->socket, asio::buffer(data, 7) ,[sesh](const error_code& e, std::size_t s)
+      	{ });
+
+	sesh->read_first_line(sesh);	
+
+	//Since socket is empty, string ss is not augmented
+	EXPECT_EQ(sesh->ss, "");
+}
+
+TEST_F(RequestTest, read_next_line)
+{
+	io_service io_service;
+   	ip::tcp::endpoint endpoint{ip::tcp::v4(), 8080};
+   	ip::tcp::acceptor acceptor{io_service, endpoint};
+        std::shared_ptr<session> sesh = std::make_shared<session>(io_service);
+
+	io_service.run();
+
+	char data[] = "Hello\r\n";
+
+	//doesn't really write to socket since it is on same side as read.
+        asio::async_write(sesh->socket, asio::buffer(data, 7) ,[sesh](const error_code& e, std::size_t s)
+      	{ });
+
+	sesh->read_next_line(sesh);	
+
+	//Since socket is empty, string ss is not augmented
+	EXPECT_EQ(sesh->ss, "");
+}
+
 
