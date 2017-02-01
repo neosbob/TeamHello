@@ -19,3 +19,16 @@ make
 # Run Integration Test:
 
 ./integration_test.sh
+
+or 
+
+make integration_test
+
+# Run all unit tests
+
+make test 
+
+# Measure test coverage
+
+make test_coverage
+

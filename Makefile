@@ -40,6 +40,9 @@ clean:
 test: clean default
 	./reply_test
 	./webserver_test
+
+integration_test: clean default
+	./integration_test.sh
 	
 test_coverage:
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
