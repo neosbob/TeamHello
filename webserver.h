@@ -4,6 +4,11 @@
 #include <boost/asio.hpp>
 #include "request_handle.h"
 
+struct configArguments
+{
+    short unsigned int port;
+};
+
 class Server
 {
 public:

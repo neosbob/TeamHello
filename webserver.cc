@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include "config_parser.h"
 #include <utility>
+#include "handlerBase.h"
 
 using namespace boost;
 using namespace boost::system;
