@@ -13,7 +13,7 @@ using namespace boost::system;
 using namespace boost::asio;
 
 
-std::string session::buildResponseStr(std::string body)
+std::string session::buildResponseStr(const std::string& body)
 {
     std::stringstream ssOut;
 

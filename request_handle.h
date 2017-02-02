@@ -14,7 +14,7 @@ public:
     {
         
     }
-    virtual std::string buildResponseStr(std::string body);
+    virtual std::string buildResponseStr(const std::string& body);
     
 private: 
 

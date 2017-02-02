@@ -75,7 +75,7 @@ int Server::parseConfig(int argc, const char * argv[], configArguments& configAr
     {
         std::cerr<< "Exception: "<< error.what() << "\n";
         return 4;
-   	}
+    }
 
     return 0;
 }

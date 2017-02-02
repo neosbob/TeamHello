@@ -24,7 +24,7 @@ public:
     
     static void read_request(std::shared_ptr<HandlerBase> pThis);
     
-    virtual std::string buildResponseStr(std::string body) = 0;
+    virtual std::string buildResponseStr(const std::string& body) = 0;
     
     std::string read_first_line_text(std::istream & stream, std::string & line, std::string & ignore);
 
