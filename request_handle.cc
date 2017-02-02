@@ -79,6 +79,7 @@ void session::read_first_line(std::shared_ptr<session> pThis)
          std::istream stream {&pThis->buff};
  
 	 pThis->ss += pThis->read_first_line_text(stream, line, ignore);
+	 pThis->headers.read_request_line(line);
          pThis->read_next_line(pThis);
       });
       
@@ -88,7 +89,6 @@ std::string session::read_first_line_text(std::istream & stream, std::string & l
    {
       	std::getline(stream, line, '\r');
         std::getline(stream, ignore, '\n');
-        //pThis->headers.read_request_line(line);
         std::string first_line;
         first_line += line + "\r\n";
 

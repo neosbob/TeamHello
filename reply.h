@@ -7,6 +7,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <utility>
+#include "mime_types.h"
 
 
 using namespace boost;

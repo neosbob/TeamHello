@@ -5,22 +5,26 @@
 #include <string>
 #include <memory>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <cstdlib>
 #include <utility>
 #include "reply.h"
+
 
 using namespace boost;
 using namespace boost::system;
 using namespace boost::asio;
 
-   
+class mime_types;   
+
 std::string http_headers::get_response(std::string echoback)
    {
       std::stringstream ssOut;
 
       //echoes back the request sent by the client
-      //if(url == "/")
-      //{
+      if(url == "/")
+      {
 
          std::string sHTML = echoback;
          ssOut << "HTTP/1.1 200 OK" << std::endl;
@@ -29,17 +33,47 @@ std::string http_headers::get_response(std::string echoback)
          ssOut << std::endl; //\r\n\r\n signals for end of response header.
          //Below is the body of the response.
          ssOut << sHTML;
-      //}
-/*
-      else
+	 return ssOut.str();
+      }
+
+      std::string request_path;
+      request_path = url;
+
+      // Determine the file extension.
+      std::size_t last_slash_pos = request_path.find_last_of("/");
+      std::size_t last_dot_pos = request_path.find_last_of(".");
+      std::string extension;
+      if (last_dot_pos != std::string::npos && last_dot_pos > last_slash_pos)
       {
-         std::string sHTML = "<html><body><p>There's nothing here.</p></body></html>";
+         extension = request_path.substr(last_dot_pos + 1);
+      }
+
+      // Open the file to send back.
+      std::string full_path = "~" + request_path;
+      std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
+      if (!is)
+      {
+         std::string sHTML = "<html><body><p>Image not found</p></body></html>";
          ssOut << "HTTP/1.1 404 Not Found" << std::endl;
-         ssOut << "content-type: text/plain" << std::endl;
+         ssOut << "content-type: text/html" << std::endl;
          ssOut << "content-length: " << sHTML.length() << std::endl;
          ssOut << std::endl;
          ssOut << sHTML;
-      }*/
+      }
+
+      // Fill out the reply to be sent to the client.
+      std::string content = "";
+      mime_types mime;
+      char buf[512];
+      while (is.read(buf, sizeof(buf)).gcount() > 0)
+          content.append(buf, is.gcount());
+
+      ssOut << "HTTP/1.1 200 OK" << std::endl;
+      ssOut << "content-type: " << mime.extension_to_type(extension) << std::endl;
+      ssOut << "content-length: " << content.length() << std::endl;
+      ssOut << std::endl;
+      ssOut << content;
+
       return ssOut.str();
    }
    
@@ -88,6 +122,8 @@ std::string http_headers::read_request_line(std::string line)
       std::cout << "request for resource: " << url << std::endl;
       return url;
    }
+
+
 
 bool http_headers::setMap(std::map<std::string, std::string> m)
 {
