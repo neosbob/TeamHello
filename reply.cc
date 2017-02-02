@@ -47,9 +47,9 @@ std::string http_headers::get_response(std::string echoback)
       {
          extension = request_path.substr(last_dot_pos + 1);
       }
-
+	std::cout << "resource path: " << request_path << std::endl;
       // Open the file to send back.
-      std::string full_path = "~" + request_path;
+      std::string full_path = "/home/bob" + request_path;
       std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
       if (!is)
       {
@@ -59,6 +59,8 @@ std::string http_headers::get_response(std::string echoback)
          ssOut << "content-length: " << sHTML.length() << std::endl;
          ssOut << std::endl;
          ssOut << sHTML;
+
+	 return ssOut.str();
       }
 
       // Fill out the reply to be sent to the client.
