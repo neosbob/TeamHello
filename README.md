@@ -32,3 +32,11 @@ make test
 
 make test_coverage
 
+-Functions that require usage of asyn_read or async_write are tested minimally.
+-Reason: 
+    -requires client to provide a message to socket that server can read from.
+    -Can't reproduce in unit tests.
+-Partial solution: 
+    -Refactored such functions to test data that async functions would 
+     have worked with 
+
