@@ -1,0 +1,88 @@
+        -:    0:Source:webserver.cc
+        -:    0:Graph:webserver.gcno
+        -:    0:Data:webserver.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:#include "webserver.h"
+        -:    2:#include <string>
+        -:    3:#include <memory>
+        -:    4:#include <iostream>
+        -:    5:#include <cstdlib>
+        -:    6:#include "config_parser.h"
+        -:    7:#include <utility>
+        -:    8:
+        -:    9:using namespace boost;
+        -:   10:using namespace boost::system;
+        -:   11:using namespace boost::asio;
+        -:   12:
+        -:   13:class session;
+        -:   14:
+    #####:   15:Server::Server(const configArguments& configArgs)
+        -:   16:: io_service()
+    #####:   17:, acceptor(io_service, ip::tcp::endpoint(ip::tcp::v4(), configArgs.port))
+        -:   18:{
+    #####:   19:    (this->acceptor).listen();
+    #####:   20:	this->configContent = configArgs;
+        -:   21:
+    #####:   22:    doAccept();
+    #####:   23:}
+        -:   24:
+    #####:   25:void Server::doAccept()
+        -:   26:{
+    #####:   27:	std::shared_ptr<session> sesh = std::make_shared<session>(io_service);
+    #####:   28:    acceptor.async_accept(sesh->socket, [sesh, this](const error_code& accept_error)
+        -:   29:    {
+    #####:   30:        if(!accept_error)
+        -:   31:        {
+    #####:   32:            session::read_request(sesh);
+        -:   33:        }
+    #####:   34:		doAccept();
+    #####:   35:    });
+    #####:   36:}
+        -:   37:
+    #####:   38:void Server::run()
+        -:   39:{
+    #####:   40:	std::cout<<"Server is running!\n";
+    #####:   41:	io_service.run();
+    #####:   42:}
+        -:   43:
+        3:   44:int Server::parseConfig(int argc, const char * argv[], configArguments& configArgs)
+        -:   45:{	
+        -:   46:	try
+        -:   47:	{
+        3:   48:		if (argc != 2)
+        -:   49:		{
+    #####:   50:			std::cerr << "Usage ./webserver <path to config file>\n";
+        2:   51:			return 1;
+        -:   52:		}
+        3:   53:		NginxConfigParser config_parser;
+        3:   54:		NginxConfig config_out;
+        -:   55:
+        3:   56:		if (config_parser.Parse(argv[1], &config_out)) 
+        -:   57:		{
+        2:   58:        	unsigned int tmpPort = std::stoi(config_out.statements_[0]->tokens_[1]);
+        2:   59:			if (tmpPort > 65535 || tmpPort < 0)
+        -:   60:			{
+        1:   61:				std::cerr << "The port number " << tmpPort << " in config file is invalid.\n";
+        1:   62:				return 2;
+        -:   63:			}
+        1:   64:			configArgs.port = (short unsigned int)tmpPort;
+        -:   65:     	}
+        -:   66:     	else 
+        -:   67:		{
+        1:   68:         	std::cerr << "Could not parse config file.\n";
+        1:   69:         	return 3;
+        1:   70:     	}
+        -:   71:	}
+        -:   72:
+    =====:   73:	catch(std::exception& error) 
+        -:   74:	{
+    =====:   75:        std::cerr<< "Exception: "<< error.what() << "\n";
+    =====:   76:		return 4;
+        -:   77:   	}
+        -:   78:
+        1:   79:	return 0;
+        3:   80:}
+        -:   81:
+        -:   82:      
+        -:   83:      

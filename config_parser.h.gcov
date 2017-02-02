@@ -1,0 +1,63 @@
+        -:    0:Source:config_parser.h
+        -:    0:Graph:webserver.gcno
+        -:    0:Data:webserver.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:// An nginx config file parser.
+        -:    2:
+        -:    3:#include <iostream>
+        -:    4:#include <memory>
+        -:    5:#include <string>
+        -:    6:#include <vector>
+        -:    7:
+        -:    8:class NginxConfig;
+        -:    9:
+        -:   10:// The parsed representation of a single config statement.
+        -:   11:class NginxConfigStatement {
+        -:   12: public:
+        -:   13:  std::string ToString(int depth);
+        -:   14:  std::vector<std::string> tokens_;
+        -:   15:  std::unique_ptr<NginxConfig> child_block_;
+        -:   16:};
+        -:   17:
+        -:   18:// The parsed representation of the entire config.
+        8:   19:class NginxConfig {
+        -:   20: public:
+        -:   21:  std::string ToString(int depth = 0);
+        -:   22:  std::vector<std::shared_ptr<NginxConfigStatement>> statements_;
+        -:   23:};
+        -:   24:
+        -:   25:// The driver that parses a config file and generates an NginxConfig.
+        -:   26:class NginxConfigParser {
+        -:   27: public:
+        3:   28:  NginxConfigParser() {}
+        -:   29:
+        -:   30:  // Take a opened config file or file name (respectively) and store the
+        -:   31:  // parsed config in the provided NginxConfig out-param.  Returns true
+        -:   32:  // iff the input config file is valid.
+        -:   33:  bool Parse(std::istream* config_file, NginxConfig* config);
+        -:   34:  bool Parse(const char* file_name, NginxConfig* config);
+        -:   35:
+        -:   36: private:
+        -:   37:  enum TokenType {
+        -:   38:    TOKEN_TYPE_START = 0,
+        -:   39:    TOKEN_TYPE_NORMAL = 1,
+        -:   40:    TOKEN_TYPE_START_BLOCK = 2,
+        -:   41:    TOKEN_TYPE_END_BLOCK = 3,
+        -:   42:    TOKEN_TYPE_COMMENT = 4,
+        -:   43:    TOKEN_TYPE_STATEMENT_END = 5,
+        -:   44:    TOKEN_TYPE_EOF = 6,
+        -:   45:    TOKEN_TYPE_ERROR = 7
+        -:   46:  };
+        -:   47:  const char* TokenTypeAsString(TokenType type);
+        -:   48:
+        -:   49:  enum TokenParserState {
+        -:   50:    TOKEN_STATE_INITIAL_WHITESPACE = 0,
+        -:   51:    TOKEN_STATE_SINGLE_QUOTE = 1,
+        -:   52:    TOKEN_STATE_DOUBLE_QUOTE = 2,
+        -:   53:    TOKEN_STATE_TOKEN_TYPE_COMMENT = 3,
+        -:   54:    TOKEN_STATE_TOKEN_TYPE_NORMAL = 4
+        -:   55:  };
+        -:   56:
+        -:   57:  TokenType ParseToken(std::istream* input, std::string* value);
+        -:   58:};

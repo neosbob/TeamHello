@@ -1,0 +1,62 @@
+        -:    0:Source:request_handle.h
+        -:    0:Graph:webserver.gcno
+        -:    0:Data:webserver.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:#ifndef HTTP_REQUEST_HANDLER_H
+        -:    2:#define HTTP_REQUEST_HANDLER_H
+        -:    3:
+        -:    4:#include <boost/asio.hpp>
+        -:    5:#include <string>
+        -:    6:#include <memory>
+        -:    7:#include <iostream>
+        -:    8:#include <cstdlib>
+        -:    9:#include <utility>
+        -:   10:#include "request_handle.h"
+        -:   11:#include "reply.h"
+        -:   12:
+        -:   13:using namespace boost;
+        -:   14:using namespace boost::system;
+        -:   15:using namespace boost::asio;
+        -:   16:
+        -:   17:// A struct to hold config arguments
+        -:   18:struct configArguments
+        -:   19:{
+        -:   20:   short unsigned int port;
+        -:   21:};
+        -:   22:
+        -:   23:
+        -:   24:/// The common handler for all incoming requests.
+        -:   25:
+    #####:   26:class session
+        -:   27:{
+        -:   28:   asio::streambuf buff;
+        -:   29:   http_headers headers;
+        -:   30:   
+        -:   31:   static void read_body(std::shared_ptr<session> pThis);
+        -:   32:   
+        -:   33:   static void read_next_line(std::shared_ptr<session> pThis);
+        -:   34:   
+        -:   35:   static void read_first_line(std::shared_ptr<session> pThis);
+        -:   36:   
+        -:   37:public:
+        -:   38:
+        -:   39:   char data[4096];
+        -:   40:
+        -:   41:   size_t length;
+        -:   42:
+        -:   43:   std::string ss;
+        -:   44:
+        -:   45:   ip::tcp::socket socket;
+        -:   46:   
+    #####:   47:   session(io_service& io_service)
+        -:   48:      :socket(io_service)
+    #####:   49:      , ss("")
+        -:   50:   {
+    #####:   51:   }
+        -:   52:   
+        -:   53:   static void read_request(std::shared_ptr<session> pThis);
+        -:   54:};
+        -:   55:
+        -:   56:
+        -:   57:#endif // HTTP_REQUEST_HANDLER_H

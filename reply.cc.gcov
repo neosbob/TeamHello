@@ -1,0 +1,104 @@
+        -:    0:Source:reply.cc
+        -:    0:Graph:reply.gcno
+        -:    0:Data:reply.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1://Inspired by minimal server design by phillipvoyle
+        -:    2://https://www.codeproject.com/Articles/1007262/A-minimal-http-web-server-using-boost-asio#_comments
+        -:    3:
+        -:    4:#include <boost/asio.hpp>
+        -:    5:#include <string>
+        -:    6:#include <memory>
+        -:    7:#include <iostream>
+        -:    8:#include <cstdlib>
+        -:    9:#include <utility>
+        -:   10:#include "reply.h"
+        -:   11:
+        -:   12:using namespace boost;
+        -:   13:using namespace boost::system;
+        -:   14:using namespace boost::asio;
+        -:   15:
+        -:   16:   
+        1:   17:std::string http_headers::get_response(std::string echoback)
+        -:   18:   {
+        1:   19:      std::stringstream ssOut;
+        -:   20:
+        -:   21:      //echoes back the request sent by the client
+        -:   22:      //if(url == "/")
+        -:   23:      //{
+        -:   24:
+        2:   25:         std::string sHTML = echoback;
+        1:   26:         ssOut << "HTTP/1.1 200 OK" << std::endl;
+        1:   27:         ssOut << "content-type: text/plain" << std::endl;
+        1:   28:         ssOut << "content-length: " << sHTML.length() << std::endl;
+        1:   29:         ssOut << std::endl; //\r\n\r\n signals for end of response header.
+        -:   30:         //Below is the body of the response.
+        1:   31:         ssOut << sHTML;
+        -:   32:      //}
+        -:   33:/*
+        -:   34:      else
+        -:   35:      {
+        -:   36:         std::string sHTML = "<html><body><p>There's nothing here.</p></body></html>";
+        -:   37:         ssOut << "HTTP/1.1 404 Not Found" << std::endl;
+        -:   38:         ssOut << "content-type: text/plain" << std::endl;
+        -:   39:         ssOut << "content-length: " << sHTML.length() << std::endl;
+        -:   40:         ssOut << std::endl;
+        -:   41:         ssOut << sHTML;
+        -:   42:      }*/
+        2:   43:      return ssOut.str();
+        -:   44:   }
+        -:   45:   
+        1:   46:int http_headers::content_length()
+        -:   47:   {
+        1:   48:      auto request = headers.find("content-length");
+        -:   49:      //This only applies if a header of "content-length" is specified
+        -:   50:      //If found, don't enter if statement.
+        1:   51:      if(request == headers.end())
+        1:   52:          return 0;
+        1:   53:      else if(request != headers.end())
+        -:   54:      {
+        1:   55:         std::stringstream ssLength(request->second);
+        -:   56:         int content_length;
+        1:   57:         ssLength >> content_length;
+        1:   58:         return content_length;
+        -:   59:      }
+    #####:   60:   }
+        -:   61:   
+        1:   62:std::string http_headers::read_header(std::string line)
+        -:   63:   {  
+        -:   64:      //only applies for lines after the first line
+        -:   65:      //Maps specific headers to a certain value
+        -:   66:      //Ex. Host: localhost. Host maps to localhost.
+        -:   67:    
+        1:   68:      std::stringstream ssHeader(line);
+        2:   69:      std::string headerName;
+        1:   70:      std::getline(ssHeader, headerName, ':');
+        -:   71:      
+        2:   72:      std::string value;
+        1:   73:      std::getline(ssHeader, value);
+        1:   74:      headers[headerName] = value;
+        -:   75:	
+        2:   76:	return headerName+":"+value;	
+        -:   77:   }
+        -:   78:   
+        1:   79:std::string http_headers::read_request_line(std::string line)
+        -:   80:   {
+        -:   81:      //This is a check for what url the request wants.
+        -:   82:
+        1:   83:      std::stringstream ssRequestLine(line);
+        1:   84:      ssRequestLine >> method;
+        1:   85:      ssRequestLine >> url;
+        1:   86:      ssRequestLine >> version;
+        -:   87:      
+        1:   88:      std::cout << "request for resource: " << url << std::endl;
+        1:   89:      return url;
+        -:   90:   }
+        -:   91:
+        2:   92:bool http_headers::setMap(std::map<std::string, std::string> m)
+        -:   93:{
+        2:   94:	headers=m;
+        2:   95:	if (headers.empty()) 
+    #####:   96:		return false;
+        -:   97:	else
+        2:   98:		return true;
+        3:   99:}
