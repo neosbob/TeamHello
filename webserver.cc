@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include "config_parser.h"
 #include <utility>
+#include "handlerBase.h"
 
 using namespace boost;
 using namespace boost::system;
@@ -74,7 +75,7 @@ int Server::parseConfig(int argc, const char * argv[], configArguments& configAr
     {
         std::cerr<< "Exception: "<< error.what() << "\n";
         return 4;
-   	}
+    }
 
     return 0;
 }
