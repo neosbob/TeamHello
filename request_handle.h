@@ -8,22 +8,21 @@
 #include <cstdlib>
 #include <utility>
 #include "reply.h"
+#include "reply_echo.h"
+#include "reply_static.h"
 
 using namespace boost;
 using namespace boost::system;
 using namespace boost::asio;
 
-struct configArguments
-{
-    short unsigned int port;
-};
 
 /// The common handler for all incoming requests.
 
 class session
 {
    asio::streambuf buff;
-   http_headers headers;
+   reply_static re_static;
+   reply_echo re_echo;
 
 public:
    
@@ -43,11 +42,14 @@ public:
 
    std::string ss = "";
 
+   std::string base_path;
+
    ip::tcp::socket socket;
    
-   session(io_service& io_service)
+   session(io_service& io_service, std::string base_dir)
       :socket(io_service)
    {
+	this->base_path = base_dir;
    }
    
    static void read_request(std::shared_ptr<session> pThis);

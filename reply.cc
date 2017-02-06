@@ -17,7 +17,7 @@ using namespace boost::system;
 using namespace boost::asio;
 
 class mime_types;   
-
+/*
 std::string http_headers::get_response(std::string echoback)
    {
       std::stringstream ssOut;
@@ -78,7 +78,7 @@ std::string http_headers::get_response(std::string echoback)
 
       return ssOut.str();
    }
-   
+   */
 int http_headers::content_length()
    {
       auto request = headers.find("content-length");

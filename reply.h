@@ -17,14 +17,15 @@ using namespace boost::asio;
 class http_headers
 {
    std::string method;
-   std::string url;
+   
    std::string version;
    
    std::map<std::string, std::string> headers;
 
 public:
+   std::string url;
    
-   std::string get_response(std::string echoback);
+   virtual std::string get_response(std::string echoback, std::string base_path) = 0;
    
    int content_length();
    

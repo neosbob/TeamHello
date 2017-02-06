@@ -4,12 +4,20 @@
 #include <boost/asio.hpp>
 #include "request_handle.h"
 
+struct configArguments
+{
+    short unsigned int port;
+    std::string baseDirectory;
+    std::string handlerType;
+};
+
 class Server
 {
 public:
 	Server(const configArguments& configArgs);
 	static int parseConfig(int argc, const char * argv[], configArguments& configArgs);
 	void run();
+	
 private:
 	void doAccept();
 
