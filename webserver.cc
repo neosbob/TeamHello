@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include "config_parser.h"
 #include <utility>
-#include "handlerBase.h"
+//#include "handlerBase.h"
 
 using namespace boost;
 using namespace boost::system;
@@ -25,15 +25,19 @@ Server::Server(const configArguments& configArgs)
 
 void Server::doAccept()
 {
-    std::shared_ptr<session> sesh = std::make_shared<session>(io_service);
-    acceptor.async_accept(sesh->socket, [sesh, this](const error_code& accept_error)
-    {
-        if(!accept_error)
+    
+
+    //std::cout << configContent.handlerType;
+        std::shared_ptr<session> sesh = std::make_shared<session>(io_service, configContent.baseDirectory);
+        acceptor.async_accept(sesh->socket, [sesh, this](const error_code& accept_error)
         {
-            session::read_request(sesh);
-        }
-        doAccept();
-    });
+            if(!accept_error)
+            {
+                session::read_request(sesh);
+            }
+            doAccept();
+        });
+
 }
 
 void Server::run()
@@ -63,6 +67,12 @@ int Server::parseConfig(int argc, const char * argv[], configArguments& configAr
                 return 2;
             }
             configArgs.port = (short unsigned int)tmpPort;
+
+	    std::string base_dir = config_out.statements_[1]->tokens_[1];
+	    configArgs.baseDirectory = base_dir;
+
+	    std::string handler_type = config_out.statements_[2]->tokens_[1];
+	    configArgs.handlerType = handler_type;
         }
         else 
         {
@@ -80,5 +90,4 @@ int Server::parseConfig(int argc, const char * argv[], configArguments& configAr
     return 0;
 }
 
-      
       
