@@ -74,6 +74,3 @@ test_coverage:
 	ar -rv libgtest.a gtest-all.o
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread webserver_test.cc webserver.cc config_parser.cc reply.cc request_handle.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o webserver_test -lboost_system -fprofile-arcs -ftest-coverage
 	./webserver_test; gcov -r webserver.cc
-
-	
-

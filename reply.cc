@@ -21,11 +21,9 @@ class mime_types;
 std::string http_headers::get_response(std::string echoback)
    {
       std::stringstream ssOut;
-
       //echoes back the request sent by the client
       if(url == "/")
       {
-
          std::string sHTML = echoback;
          ssOut << "HTTP/1.1 200 OK" << std::endl;
          ssOut << "content-type: text/plain" << std::endl;
@@ -35,10 +33,8 @@ std::string http_headers::get_response(std::string echoback)
          ssOut << sHTML;
 	 return ssOut.str();
       }
-
       std::string request_path;
       request_path = url;
-
       // Determine the file extension.
       std::size_t last_slash_pos = request_path.find_last_of("/");
       std::size_t last_dot_pos = request_path.find_last_of(".");
@@ -59,23 +55,19 @@ std::string http_headers::get_response(std::string echoback)
          ssOut << "content-length: " << sHTML.length() << std::endl;
          ssOut << std::endl;
          ssOut << sHTML;
-
 	 return ssOut.str();
       }
-
       // Fill out the reply to be sent to the client.
       std::string content = "";
       mime_types mime;
       char buf[512];
       while (is.read(buf, sizeof(buf)).gcount() > 0)
           content.append(buf, is.gcount());
-
       ssOut << "HTTP/1.1 200 OK" << std::endl;
       ssOut << "content-type: " << mime.extension_to_type(extension) << std::endl;
       ssOut << "content-length: " << content.length() << std::endl;
       ssOut << std::endl;
       ssOut << content;
-
       return ssOut.str();
    }
    */

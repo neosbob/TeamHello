@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "reply.h"
 
+/*
 TEST(ReplyTest, GetResponse)
 {
 	http_headers h;
@@ -16,23 +17,24 @@ TEST(ReplyTest, GetResponse)
 	std::string s2 = h.get_response(s);
 	EXPECT_EQ(ssOut.str(),s2);
 }
+*/
 
-TEST(ReplyTest, ReadHeader)
+TEST(ReplyTest, ParseHeader)
 {
 	http_headers h;
 	std::stringstream ssOut;
-        ssOut << "content-type: text/plain" << std::endl;
+    ssOut << "content-type: text/plain" << std::endl;
 	std::string s = ssOut.str();
-	std::string header_value = h.read_header(s);
+	std::string header_value = h.parse_header(s);
 	EXPECT_EQ(header_value,"content-type: text/plain");
 	
 }
 
-TEST(ReplyTest, ReadReqLine)
+TEST(ReplyTest, ParseReqLine)
 {
 	http_headers h;
 	std::string line = "GET /www HTTP/1.1";
-	std::string url = h.read_request_line(line);
+	std::string url = h.parse_request_line(line);
 	EXPECT_EQ("/www", url);
 
 }
