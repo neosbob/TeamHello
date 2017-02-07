@@ -19,18 +19,20 @@ using namespace boost::asio;
 class mime_types;   
 
 std::string reply_static::get_response(std::string echoback, std::string base_path)
-   {
-      std::stringstream ssOut;
+{
+    std::stringstream ssOut;
 
-    std::string request_path, request_static;
-    if(url.size() > 7){
-      request_static = url.substr(0,8);
-      request_path = url.substr(7);
+    std::string request_path, static_path, request_echo, echo_path, sfile_dir;
+    std::size_t url_found = url.find("/", 1);
+    if (url_found != std::string::npos){
+        static_path = url.substr(0,url_found);
+	request_path = url.substr(url_found);
     }
+	       
 
     //TODO: Errorchecking for empty file url.
       
-    if (request_static == "/static/" && request_path != "/") {
+    if (request_path != "/") {
       // Determine the file extension.
       std::size_t last_slash_pos = request_path.find_last_of("/");
       std::size_t last_dot_pos = request_path.find_last_of(".");
@@ -71,7 +73,7 @@ std::string reply_static::get_response(std::string echoback, std::string base_pa
       return ssOut.str();
     }
 
-    else if (request_static == "/static/" && request_path == "/")
+    else if (request_path == "/")
     {
 	std::string sHTML = "<html><body><p>URL starts with \"/static/\", but no file specified. </p></body></html>";
         ssOut << "HTTP/1.1 404 Not Found" << std::endl;
@@ -93,6 +95,6 @@ std::string reply_static::get_response(std::string echoback, std::string base_pa
 
 	return ssOut.str();
     }
-   }
+}
    
 
