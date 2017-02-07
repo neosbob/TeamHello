@@ -47,4 +47,4 @@ make test_coverage
 
 # To test with /static/file_name
 
-whenever /static/file_name is tested, we need to edit base-path to be the path on your personal computer where we serve the file from
+whenever /static/file_name is tested, base-path in SimpleConfig needs to edited to be the path on personal computer where the file is served from
