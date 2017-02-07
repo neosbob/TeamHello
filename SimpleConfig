@@ -1,3 +1,4 @@
 port 8080;
 base-path /home/bob;
-handler_type echo;
+path /echo reply_echo;
+path /static reply_static;

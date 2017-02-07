@@ -30,7 +30,7 @@ std::string reply_static::get_response(std::string echoback, std::string base_pa
 
     //TODO: Errorchecking for empty file url.
       
-    if (request_static == "/static/") {
+    if (request_static == "/static/" && request_path != "/") {
       // Determine the file extension.
       std::size_t last_slash_pos = request_path.find_last_of("/");
       std::size_t last_dot_pos = request_path.find_last_of(".");
@@ -69,6 +69,18 @@ std::string reply_static::get_response(std::string echoback, std::string base_pa
       ssOut << content;
 
       return ssOut.str();
+    }
+
+    else if (request_static == "/static/" && request_path == "/")
+    {
+	std::string sHTML = "<html><body><p>URL starts with \"/static/\", but no file specified. </p></body></html>";
+        ssOut << "HTTP/1.1 404 Not Found" << std::endl;
+        ssOut << "content-type: text/html" << std::endl;
+        ssOut << "content-length: " << sHTML.length() << std::endl;
+        ssOut << std::endl;
+        ssOut << sHTML;
+
+	return ssOut.str();
     }
 
     else {
