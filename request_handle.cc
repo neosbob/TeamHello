@@ -75,7 +75,7 @@ void session::read_next_line(std::shared_ptr<session> pThis)
 	       else if (request_echo == pThis->echo_map)
 		   str = std::make_shared<std::string>(pThis->re_echo.get_response(echoback, "/"));
 	       else
-		   str = std::make_shared<std::string>(pThis->re_echo.get_response(echoback, "/"));
+		   str = std::make_shared<std::string>(pThis->re_static.get_response(echoback, ""));
                    asio::async_write(pThis->socket, boost::asio::buffer(str->c_str(), str->length()), [pThis, str](const error_code& e, std::size_t s)
                {
                   //return str->c_str();

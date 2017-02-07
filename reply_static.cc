@@ -32,7 +32,7 @@ std::string reply_static::get_response(std::string echoback, std::string base_pa
 
     //TODO: Errorchecking for empty file url.
       
-    if (request_path != "/") {
+    if (request_path != "/" && request_path != "") {
       // Determine the file extension.
       std::size_t last_slash_pos = request_path.find_last_of("/");
       std::size_t last_dot_pos = request_path.find_last_of(".");
