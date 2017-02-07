@@ -42,14 +42,17 @@ public:
 
    std::string ss = "";
 
-   std::string base_path;
+   std::string base_path, echo_map, static_map;
 
    ip::tcp::socket socket;
    
-   session(io_service& io_service, std::string base_dir)
+   session(io_service& io_service, std::string base_dir, std::string echo_path, std::string static_path)
       :socket(io_service)
    {
 	this->base_path = base_dir;
+	this->echo_map = echo_path;
+	this->static_map = static_path;
+	
    }
    
    static void read_request(std::shared_ptr<session> pThis);

@@ -51,7 +51,8 @@ void session::read_next_line(std::shared_ptr<session> pThis)
             //This signals end of request's body
             else
             {
-	       std::string request_path, request_static;
+	       std::string request_path, request_static, static_path;
+	       static_path = pThis->static_map + "/";
  	       if(pThis->re_static.url.size() > 7){
                    request_static = pThis->re_static.url.substr(0,8);
                    request_path = pThis->re_static.url.substr(7);
@@ -61,9 +62,9 @@ void session::read_next_line(std::shared_ptr<session> pThis)
                
 	       std::shared_ptr<std::string> str;
 
-               if(request_static == "/static/")
+               if(request_static == static_path)
 		   str = std::make_shared<std::string>(pThis->re_static.get_response(echoback, pThis->base_path));
-	       else if (request_path == "/echo")
+	       else if (request_path == pThis->echo_map)
 		   str = std::make_shared<std::string>(pThis->re_echo.get_response(echoback, pThis->base_path));
 	       else
 		   str = std::make_shared<std::string>(pThis->re_echo.get_response(echoback, pThis->base_path));

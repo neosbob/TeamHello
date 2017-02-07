@@ -8,7 +8,8 @@ struct configArguments
 {
     short unsigned int port;
     std::string baseDirectory;
-    std::string handlerType;
+    std::string echo_path;
+    std::string static_path;
 };
 
 class Server
