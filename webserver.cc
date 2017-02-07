@@ -29,7 +29,7 @@ void Server::doAccept()
     
 
     //std::cout << configContent.handlerType;
-        std::shared_ptr<session> sesh = std::make_shared<session>(io_service, configContent.baseDirectory, configContent.echo_path, configContent.static_path);
+        std::shared_ptr<session> sesh = std::make_shared<session>(io_service, configContent.map_path_rootdir, configContent.echo_path, configContent.static_path);
         acceptor.async_accept(sesh->socket, [sesh, this](const error_code& accept_error)
         {
             if(!accept_error)
@@ -57,6 +57,7 @@ int Server::parseConfig(int argc, const char * argv[], configArguments& configAr
             return 1;
         }
         NginxConfigParser config_parser;
+	//NginxConfigStatement config_blocks;
         NginxConfig config_out;
 
         if (config_parser.Parse(argv[1], &config_out)) 
@@ -82,18 +83,7 @@ int Server::parseConfig(int argc, const char * argv[], configArguments& configAr
                         return 3;
                     }
                 }
-                else if (header == "base-path")
-                {
-                    if (config_out.statements_[i]->tokens_.size() > 1)
-                    {
-                        configArgs.baseDirectory = config_out.statements_[i]->tokens_[1];
-                    }
-                    else
-                    {
-                        std::cerr << "Please specify a base path.\n";
-                        return 3;
-                    }
-                }
+                
                 else if (header == "path")
                 {
                     if (config_out.statements_[i]->tokens_.size() > 2)
@@ -102,9 +92,20 @@ int Server::parseConfig(int argc, const char * argv[], configArguments& configAr
                         {
 	                        configArgs.echo_path = config_out.statements_[i]->tokens_[1];
                         }
-                        else if (config_out.statements_[i]->tokens_[1] == "/static")
+                        else if (config_out.statements_[i]->tokens_[1].find("/") == 0 && config_out.statements_[i]->tokens_[2] == "reply_static")
                         {
                             configArgs.static_path = config_out.statements_[i]->tokens_[1];
+			    std::shared_ptr<NginxConfigStatement> temp_config = config_out.statements_[i];
+			    if (temp_config->child_block_->statements_[0]->tokens_[0] == "root" && temp_config->child_block_->statements_[0]->tokens_.size() > 1)
+                            {
+                                std::string baseDirectory = temp_config->child_block_->statements_[0]->tokens_[1];
+				configArgs.map_path_rootdir.insert(std::pair<std::string, std::string>(configArgs.static_path, baseDirectory));
+                            }
+			    else
+                   	    {
+                                std::cerr << "Please specify a base path for request handler.\n";
+                                return 3;
+                            }
                         }
                         else
                         {

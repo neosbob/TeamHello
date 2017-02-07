@@ -42,11 +42,13 @@ public:
 
    std::string ss = "";
 
-   std::string base_path, echo_map, static_map;
+   std::string echo_map, static_map;
+
+   std::map<std::string, std::string> base_path;
 
    ip::tcp::socket socket;
    
-   session(io_service& io_service, std::string base_dir, std::string echo_path, std::string static_path)
+   session(io_service& io_service, std::map<std::string,std::string> base_dir, std::string echo_path, std::string static_path)
       :socket(io_service)
    {
 	this->base_path = base_dir;

@@ -51,23 +51,31 @@ void session::read_next_line(std::shared_ptr<session> pThis)
             //This signals end of request's body
             else
             {
-	       std::string request_path, request_static, static_path;
-	       static_path = pThis->static_map + "/";
- 	       if(pThis->re_static.url.size() > 7){
-                   request_static = pThis->re_static.url.substr(0,8);
-                   request_path = pThis->re_static.url.substr(7);
+	       std::string request_path, static_path, request_echo, echo_path, sfile_dir;
+               std::size_t url_found = pThis->re_static.url.find("/", 1);
+	       if (url_found != std::string::npos){
+	           static_path = pThis->re_static.url.substr(0,url_found);
+		   request_path = pThis->re_static.url.substr(url_found);
+                   std::map<std::string, std::string>::iterator it;
+	           it = pThis->base_path.find(static_path);
+	           if (it != pThis->base_path.end())
+	               sfile_dir = pThis->base_path.find(static_path)->second;
                }
-               else if ( pThis->re_static.url.size() > 4)
-	           request_path = pThis->re_static.url.substr(0,5);
+	       std::size_t echo_found = pThis->re_static.url.find("/echo");
+               if ( echo_found != std::string::npos){
+	           request_echo = pThis->re_static.url.substr(0,5);
+		   echo_path = pThis->re_static.url.substr(5);
+               }
                
+	       
 	       std::shared_ptr<std::string> str;
-
-               if(request_static == static_path)
-		   str = std::make_shared<std::string>(pThis->re_static.get_response(echoback, pThis->base_path));
-	       else if (request_path == pThis->echo_map)
-		   str = std::make_shared<std::string>(pThis->re_echo.get_response(echoback, pThis->base_path));
+	       
+               if(sfile_dir != "")
+		   str = std::make_shared<std::string>(pThis->re_static.get_response(echoback, sfile_dir));
+	       else if (request_echo == pThis->echo_map)
+		   str = std::make_shared<std::string>(pThis->re_echo.get_response(echoback, "/"));
 	       else
-		   str = std::make_shared<std::string>(pThis->re_echo.get_response(echoback, pThis->base_path));
+		   str = std::make_shared<std::string>(pThis->re_static.get_response(echoback, ""));
                    asio::async_write(pThis->socket, boost::asio::buffer(str->c_str(), str->length()), [pThis, str](const error_code& e, std::size_t s)
                {
                   //return str->c_str();
