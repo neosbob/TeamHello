@@ -28,7 +28,7 @@ void Server::doAccept()
     
 
     //std::cout << configContent.handlerType;
-        std::shared_ptr<session> sesh = std::make_shared<session>(io_service, configContent.baseDirectory);
+        std::shared_ptr<session> sesh = std::make_shared<session>(io_service, configContent.baseDirectory, configContent.echo_path, configContent.static_path);
         acceptor.async_accept(sesh->socket, [sesh, this](const error_code& accept_error)
         {
             if(!accept_error)
@@ -71,8 +71,12 @@ int Server::parseConfig(int argc, const char * argv[], configArguments& configAr
 	    std::string base_dir = config_out.statements_[1]->tokens_[1];
 	    configArgs.baseDirectory = base_dir;
 
-	    std::string handler_type = config_out.statements_[2]->tokens_[1];
-	    configArgs.handlerType = handler_type;
+	    std::string echo_path = config_out.statements_[2]->tokens_[1];
+	    configArgs.echo_path = echo_path;
+
+	    std::string static_path = config_out.statements_[3]->tokens_[1];
+	    configArgs.static_path = static_path;
+	    
         }
         else 
         {
