@@ -19,12 +19,15 @@ make
 Can test on browser with:
 
 localhost:8080/static/apple.jpg
+
 localhost:8080/static/sample.html
+
 localhost:8080/testpath/orange.jpg
+
 localhost:8080/echo
 
 - The port number, keyword, and path name can be changed in SimpleConfig
-- The default ones are above 
+- Can try the above ones for our current SimpleConfig 
 
 # Run Integration Test:
 
