@@ -16,19 +16,37 @@ make
 
 ./webserver SimpleConfig
 
+Can test on browser with:
+
+localhost:8080/static/apple.jpg
+localhost:8080/static/sample.html
+localhost:8080/testpath/orange.jpg
+localhost:8080/echo
+
+- The port number, keyword, and path name can be changed in SimpleConfig
+- The default ones are above 
+
 # Run Integration Test:
 
 ./integration_test.sh
 
 or 
 
+make
+
 make integration_test
 
+To run integration_test, you have to change the SimpleConfig file to include the path in your computer 
+
 # Run all unit tests
+
+make 
 
 make test 
 
 # Measure test coverage
+
+make
 
 make test_coverage
 

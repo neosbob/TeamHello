@@ -2,11 +2,11 @@ port 8080;
 path /echo reply_echo;
 path /static reply_static
 {
-    root /home/bob;
+    root ./test_folder;
 }
 
 path /testpath reply_static
 {
-    root /home/bob/cs130R/HW4/TeamHello;
+    root ./test_folder2;
 }
 
