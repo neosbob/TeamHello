@@ -18,6 +18,7 @@ public:
 	Server(const configArguments& configArgs);
 	static int parseConfig(int argc, const char * argv[], configArguments& configArgs);
 	void run();
+	int getTotalRequestCount(){return totalRequestCount;}
 	
 private:
 	void doAccept();
@@ -25,6 +26,7 @@ private:
 	boost::asio::io_service io_service;
 	boost::asio::ip::tcp::acceptor acceptor;
 	configArguments configContent;
+	int totalRequestCount;
 };
 
 #endif //WEBSERVER_H
