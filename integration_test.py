@@ -32,7 +32,7 @@ def testCase3():
     configFile = open(CONFIGFILENAME, 'r')
     for line in configFile:
         tokens = re.split(' ', line)
-        if tokens[0] == "base-path":
+        if tokens[0] == "base-path" or tokens[1] == "root":
             basePath = tokens[1].replace(";\n", "")
             break;
     configFile.close()
