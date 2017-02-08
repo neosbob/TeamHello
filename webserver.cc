@@ -28,13 +28,14 @@ Server::Server(const configArguments& configArgs)
 void Server::doAccept()
 {
 
-    //std::cout << configContent.handlerType;
-        std::shared_ptr<session> sesh = std::make_shared<session>(io_service, configContent.map_path_rootdir, configContent.echo_path, configContent.static_path);
-        acceptor.async_accept(sesh->socket, [sesh, this](const error_code& accept_error)
+    totalRequestCount++;
+    std::shared_ptr<session> sesh = std::make_shared<session>(io_service, configContent.map_path_rootdir, configContent.echo_path, configContent.static_path);
+    acceptor.async_accept(sesh->socket, [sesh, this](const error_code& accept_error)
+    {
+        if(!accept_error)
         {
             session::read_request(sesh);
         }
-        totalRequestCount++;
         doAccept();
     });
 
