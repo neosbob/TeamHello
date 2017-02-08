@@ -62,7 +62,6 @@ clean:
 	rm -rf *.o *~ *.gch *.swp *.dSYM *.gcda *.gcno *.gcov config_parser config_parser_test *.tar.gz webserver reply.o request_handle.o reply_test webserver_test request_handle_test reply_echo_test reply_static_test
 
 test: clean default
-	./reply_test
 	./webserver_test
 	./request_handle_test
 	./reply_echo_test

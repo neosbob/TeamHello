@@ -7,7 +7,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <utility>
-
+//test with wrong path with no keyword
 TEST(ReplyStaticTest, GetResponse_notStatic)
 {
 	reply_static r;
@@ -28,7 +28,7 @@ TEST(ReplyStaticTest, GetResponse_notStatic)
 	std::string s2 = r.get_response(s,b);
 	EXPECT_EQ(ssOut.str(),s2);
 }
-
+//test with an empty file
 TEST(ReplyStaticTest, GetResponse_EmptyFile)
 {
 	reply_static r;
@@ -49,7 +49,7 @@ TEST(ReplyStaticTest, GetResponse_EmptyFile)
 	std::string s2 = r.get_response(s,b);
 	EXPECT_EQ(ssOut.str(),s2);
 }
-
+//test with JPG file
 TEST(ReplyStaticTest, GetResponse_JPGFile)
 {
 	reply_static r;
@@ -57,10 +57,10 @@ TEST(ReplyStaticTest, GetResponse_JPGFile)
 	std::stringstream ssOut;
 
 	std::string content = "";
-	std::string full_path = "./picture/apple.jpg";
+	std::string full_path = "./test_folder/apple.jpg";
       	mime_types mime;
 	std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
-	std::string extension = "jpeg";
+	std::string extension = "jpg";
       	char buf[512];
       	while (is.read(buf, sizeof(buf)).gcount() > 0)
         content.append(buf, is.gcount());
@@ -71,7 +71,7 @@ TEST(ReplyStaticTest, GetResponse_JPGFile)
       	ssOut << std::endl;
       	ssOut << content;
 
-	std::string b = "./picture/";
+	std::string b = "./test_folder/";
 
 	r.url = "/static/apple.jpg";
 
@@ -79,6 +79,7 @@ TEST(ReplyStaticTest, GetResponse_JPGFile)
 	EXPECT_EQ(ssOut.str(),s2);
 }
 
+//test when the file does not exist
 TEST(ReplyStaticTest, GetResponse_NonEmptyFile_notexist)
 {
 	reply_static r;
@@ -86,7 +87,7 @@ TEST(ReplyStaticTest, GetResponse_NonEmptyFile_notexist)
 	std::stringstream ssOut;
 
 	std::string content = "";
-	std::string full_path = "./picture/orange.jpg";
+	std::string full_path = "./test_folder/orange.jpg";
       	mime_types mime;
 	std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
 	std::string extension = "jpeg";
@@ -101,7 +102,7 @@ TEST(ReplyStaticTest, GetResponse_NonEmptyFile_notexist)
          ssOut << std::endl;
          ssOut << sHTML;
 
-	std::string b = "./picture/";
+	std::string b = "./test_folder/";
 
 	r.url = "/static/orange.jpg";
 
@@ -109,6 +110,7 @@ TEST(ReplyStaticTest, GetResponse_NonEmptyFile_notexist)
 	EXPECT_EQ(ssOut.str(),s2);
 }
 
+//test with HTML file
 TEST(ReplyStaticTest, GetResponse_HTMLfile)
 {
 	reply_static r;
@@ -116,7 +118,7 @@ TEST(ReplyStaticTest, GetResponse_HTMLfile)
 	std::stringstream ssOut;
 
 	std::string content = "";
-	std::string full_path = "./picture/sample.html";
+	std::string full_path = "./test_folder/sample.html";
       	mime_types mime;
 	std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
 	std::string extension = "html";
@@ -130,7 +132,7 @@ TEST(ReplyStaticTest, GetResponse_HTMLfile)
       	ssOut << std::endl;
       	ssOut << content;
 
-	std::string b = "./picture/";
+	std::string b = "./test_folder/";
 
 	r.url = "/static/sample.html";
 
