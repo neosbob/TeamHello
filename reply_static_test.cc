@@ -50,7 +50,7 @@ TEST(ReplyStaticTest, GetResponse_EmptyFile)
 	EXPECT_EQ(ssOut.str(),s2);
 }
 
-TEST(ReplyStaticTest, GetResponse_NonEmptyFile_exist)
+TEST(ReplyStaticTest, GetResponse_JPGFile)
 {
 	reply_static r;
 	std::string s = "test string";
@@ -108,3 +108,33 @@ TEST(ReplyStaticTest, GetResponse_NonEmptyFile_notexist)
 	std::string s2 = r.get_response(s,b);
 	EXPECT_EQ(ssOut.str(),s2);
 }
+
+TEST(ReplyStaticTest, GetResponse_HTMLfile)
+{
+	reply_static r;
+	std::string s = "test string";
+	std::stringstream ssOut;
+
+	std::string content = "";
+	std::string full_path = "./picture/sample.html";
+      	mime_types mime;
+	std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
+	std::string extension = "html";
+      	char buf[512];
+      	while (is.read(buf, sizeof(buf)).gcount() > 0)
+        content.append(buf, is.gcount());
+
+      	ssOut << "HTTP/1.1 200 OK" << std::endl;
+     	ssOut << "content-type: " << mime.extension_to_type(extension) << std::endl;
+      	ssOut << "content-length: " << content.length() << std::endl;
+      	ssOut << std::endl;
+      	ssOut << content;
+
+	std::string b = "./picture/";
+
+	r.url = "/static/sample.html";
+
+	std::string s2 = r.get_response(s,b);
+	EXPECT_EQ(ssOut.str(),s2);
+}
+
