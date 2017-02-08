@@ -31,8 +31,10 @@ def testCase3():
     basePath = ""
     configFile = open(CONFIGFILENAME, 'r')
     for line in configFile:
-        tokens = re.split(' ', line)
-        if tokens[0] == "base-path" or tokens[1] == "root":
+        tokens = line.lstrip(' ')
+        tokens = re.split(' ', tokens)
+        if tokens[0] == "base-path" or tokens[0] == "root":
+            
             basePath = tokens[1].replace(";\n", "")
             break;
     configFile.close()
