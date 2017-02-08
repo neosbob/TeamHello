@@ -22,7 +22,8 @@ TEST_F(RequestTest, read_next_line_text)
 {
 	io_service io_service;
    	ip::tcp::endpoint endpoint{ip::tcp::v4(), 8080};
-	std::shared_ptr<session> sesh = std::make_shared<session>(io_service, "/home/bob", "/echo", "/static");
+	std::map<std::string, std::string> url_map;
+	std::shared_ptr<session> sesh = std::make_shared<session>(io_service, url_map, "/echo", "/static");
 
 	std::string line, ignore;
 	std::istringstream ss("Hello\r\n");
@@ -42,7 +43,8 @@ TEST_F(RequestTest, read_first_line_text)
 {
 	io_service io_service;
    	ip::tcp::endpoint endpoint{ip::tcp::v4(), 8080};
-	std::shared_ptr<session> sesh = std::make_shared<session>(io_service, "/home/bob", "/echo", "/static");
+	std::map<std::string, std::string> url_map;
+	std::shared_ptr<session> sesh = std::make_shared<session>(io_service, url_map, "/echo", "/static");
 
 	std::string line, ignore;
 	std::istringstream ss("Hello\r\n");
@@ -65,7 +67,8 @@ TEST_F(RequestTest, read_request)
 	io_service io_service;
    	ip::tcp::endpoint endpoint{ip::tcp::v4(), 8080};
    	ip::tcp::acceptor acceptor{io_service, endpoint};
-        std::shared_ptr<session> sesh = std::make_shared<session>(io_service, "/home/bob", "/echo", "/static");
+        std::map<std::string, std::string> url_map;
+	std::shared_ptr<session> sesh = std::make_shared<session>(io_service, url_map, "/echo", "/static");
 	io_service.run();
 
 	char data[] = "Hello\r\n";
@@ -85,8 +88,8 @@ TEST_F(RequestTest, read_first_line)
 	io_service io_service;
    	ip::tcp::endpoint endpoint{ip::tcp::v4(), 8080};
    	ip::tcp::acceptor acceptor{io_service, endpoint};
-        std::shared_ptr<session> sesh = std::make_shared<session>(io_service, "/home/bob", "/echo", "/static");
-
+        std::map<std::string, std::string> url_map;
+	std::shared_ptr<session> sesh = std::make_shared<session>(io_service, url_map, "/echo", "/static");
 	io_service.run();
 
 	char data[] = "Hello\r\n";
@@ -106,8 +109,8 @@ TEST_F(RequestTest, read_next_line)
 	io_service io_service;
    	ip::tcp::endpoint endpoint{ip::tcp::v4(), 8080};
    	ip::tcp::acceptor acceptor{io_service, endpoint};
-        std::shared_ptr<session> sesh = std::make_shared<session>(io_service, "/home/bob", "/echo", "/static");
-
+        std::map<std::string, std::string> url_map;
+	std::shared_ptr<session> sesh = std::make_shared<session>(io_service, url_map, "/echo", "/static");
 	io_service.run();
 
 	char data[] = "Hello\r\n";

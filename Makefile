@@ -69,7 +69,7 @@ test: clean default
 	./reply_static_test
 
 integration_test: clean default
-	./integration_test.sh
+	python integration_test.py
 	
 test_coverage:
 

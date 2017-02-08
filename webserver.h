@@ -1,15 +1,16 @@
 #ifndef WEBSERVER_H
 #define WEBSERVER_H
 
+#include <map>
 #include <boost/asio.hpp>
 #include "request_handle.h"
 
 struct configArguments
 {
     short unsigned int port;
-    std::string baseDirectory;
-    std::string echo_path;
     std::string static_path;
+    std::string echo_path;
+    std::map<std::string,std::string> map_path_rootdir;
 };
 
 class Server
