@@ -9,8 +9,8 @@
 #include <sstream>
 #include <cstdlib>
 #include <utility>
-#include "reply.h"
-#include "reply_static.h"
+#include "request_handler.h"
+#include "request_handler_static.h"
 
 using namespace boost;
 using namespace boost::system;

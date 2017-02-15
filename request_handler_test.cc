@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "reply.h"
+#include "request_handler.h"
 
 /*
 TEST(ReplyTest, GetResponse)

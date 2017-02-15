@@ -8,7 +8,7 @@
 #include <cstdlib>
 #include <utility>
 #include "mime_types.h"
-#include "reply.h"
+#include "request_handler.h"
 
 using namespace boost;
 using namespace boost::system;
