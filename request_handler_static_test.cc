@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "reply_static.h"
+#include "request_handler_static.h"
 #include <string>
 #include <memory>
 #include <iostream>
@@ -7,7 +7,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <utility>
-//test with wrong path with no keyword
+//test with wrong path with no keywords
 TEST(ReplyStaticTest, GetResponse_notStatic)
 {
 	reply_static r;

@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "reply_echo.h"
+#include "request_handler_echo.h"
 
 TEST(ReplyEchoTest, GetResponse)
 {

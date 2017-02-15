@@ -1,5 +1,5 @@
-#ifndef REPLY_H
-#define REPLY_H
+#ifndef REQUEST_HANDLER_H
+#define REQUEST_HANDLER_H
 
 #include <boost/asio.hpp>
 #include <string>
@@ -38,4 +38,4 @@ public:
    
 };
 
-#endif // REPLY_H
+#endif // REQUEST_HANDLER_H
