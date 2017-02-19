@@ -14,7 +14,7 @@ using namespace boost;
 using namespace boost::system;
 using namespace boost::asio;
 
-class http_headers
+class request_handler
 {
    std::string method;
    

@@ -15,12 +15,12 @@ using namespace boost;
 using namespace boost::system;
 using namespace boost::asio;
 
-class reply_echo : public http_headers
+class reply_echo : public request_handler
 {
 
 public:
    
-   reply_echo() : http_headers(){}
+   reply_echo() : request_handler (){}
 
    virtual std::string get_response(std::string echoback, std::string base_path);
 
