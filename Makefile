@@ -4,7 +4,7 @@ CXXFLAGS= -g -Wall -pthread -std=c++11 $(CXXOPTIMIZE)
 GTEST_DIR=googletest/googletest
 SERVERCLASSES=config_parser.cc
 
-default:  config_parser config_parser_test request_handler.o request_handler_echo.o request_handler_static.o mime_types.o session.o webserver webserver_test session_test request_handler_echo_test request_handler_static_test
+default:  config_parser config_parser_test request_handler.o request_handler_echo.o request_handler_static.o request_handler_notfound.o mime_types.o session.o webserver webserver_test session_test request_handler_echo_test request_handler_static_test
 
 request_handler.o: request_handler.cc request_handler.h mime_types.h mime_types.cc
 	g++ -c -std=c++11 request_handler.cc -lboost_system
@@ -14,6 +14,9 @@ request_handler_static.o: request_handler_static.cc request_handler_static.h req
 
 request_handler_echo.o: request_handler_echo.cc request_handler_echo.h request_handler.h mime_types.h mime_types.cc
 	g++ -c -std=c++11 request_handler_echo.cc -lboost_system
+
+request_handler_notfound.o: request_handler_notfound.cc request_handler_notfound.h request_handler.h mime_types.h mime_types.cc
+	g++ -c -std=c++11 request_handler_notfound.cc -lboost_system
 
 session.o: session.cc session.h request_handler.h request_handler_echo.h request_handler_static.h
 	g++ -c -std=c++11 session.cc  -lboost_system
