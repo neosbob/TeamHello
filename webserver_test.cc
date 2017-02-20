@@ -82,7 +82,8 @@ TEST_F(ConfigTest, pathCorrectConfig)
 {
 	const char* argv[2] = {"./webserver", "pathCorrectConfig"};
 	configFile.open("pathCorrectConfig");
-	configFile << "port 8080;\npath /echo reply_echo;\npath /static reply_static\n{\n    root /home/ubuntu;\n}\n\npath /testpath reply_static\n{\n    root /home/ubuntu;\n}\n";
+	configFile << "port 8080;\npath /echo EchoHandler{}\npath /static StaticHandler\n{\n    root ./test_folder;\n}\n";
+
 	configFile.close();
 	int errorCode = Server::parseConfig(2, argv, configArgs);
 	remove("pathCorrectConfig");

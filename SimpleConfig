@@ -1,12 +1,10 @@
-port 8080;
-path /echo reply_echo;
-path /static reply_static
-{
-    root ./test_folder;
+port 8080;  # This is also a comment.
+
+path /static StaticHandler {
+  root ./test_folder;
 }
 
-path /testpath reply_static
-{
-    root ./test_folder2;
-}
+path /echo EchoHandler {}
 
+# Default response handler if no handlers match.
+default NotFoundHandler {}

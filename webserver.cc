@@ -92,7 +92,7 @@ int Server::parseConfig(int argc, const char * argv[], configArguments& configAr
                         {
 	                        configArgs.echo_path = config_out.statements_[i]->tokens_[1];
                         }
-                        else if (config_out.statements_[i]->tokens_[1].find("/") == 0 && config_out.statements_[i]->tokens_[2] == "reply_static")
+                        else if (config_out.statements_[i]->tokens_[1].find("/") == 0 && config_out.statements_[i]->tokens_[2] == "StaticHandler")
                         {
                             configArgs.static_path = config_out.statements_[i]->tokens_[1];
 			    std::shared_ptr<NginxConfigStatement> temp_config = config_out.statements_[i];

@@ -1,5 +1,5 @@
-#ifndef REPLY_STATIC_H
-#define REPLY_STATIC_H
+#ifndef REPLY_NOTFOUND_H
+#define REPLY_NOTFOUND_H
 
 #include <boost/asio.hpp>
 #include <string>
@@ -14,12 +14,12 @@ using namespace boost;
 using namespace boost::system;
 using namespace boost::asio;
 
-class reply_static: public request_handler
+class reply_notfound: public request_handler
 {
 
 public:
    
-    reply_static() : request_handler ()
+    reply_notfound() : request_handler ()
     {
     }
 
