@@ -11,6 +11,7 @@
 #include <utility>
 #include "file_handler.h"
 #include "not_found_handler.h"
+#include "config_parser.h"
 
 using namespace boost;
 using namespace boost::system;

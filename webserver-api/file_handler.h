@@ -11,6 +11,7 @@
 #include <utility>
 #include <map>
 #include "request_handler.h"
+#include "config_parser.h"
 
 // Represents the parent of all request handlers. Implementations should expect to
 // be long lived and created at server constrution.

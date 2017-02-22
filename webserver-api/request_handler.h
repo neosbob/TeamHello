@@ -19,8 +19,8 @@
 class RequestHandler {
  public:
   enum Status {
-    OK = 0;
-    FAILED = 1;
+    OK = 0,
+    FAILED = 1
     // Define your status codes here.
   };
   

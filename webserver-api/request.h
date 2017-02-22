@@ -13,7 +13,7 @@ typedef std::vector<std::pair<std::string, std::string>> Headers;
 //   auto request = Request::Parse(raw_request);
 class Request {
     public:
-        static unique_ptr<Request> Parse(const std::string& raw_request);
+        static std::unique_ptr<Request> Parse(const std::string& raw_request);
 	std::string read_request_line(std::string line);
 	bool read_header(std::string headers);
 
@@ -27,11 +27,11 @@ class Request {
 
     private:
 	//member variables
-        std::string raw_request;
-        std::string method;
-        std::string uri;
-        std::string version;
-        std::string body;
+        std::string raw_request_;
+        std::string method_;
+        std::string uri_;
+        std::string version_;
+        std::string body_;
 	Headers headers_;
 };
 

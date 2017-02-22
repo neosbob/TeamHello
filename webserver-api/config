@@ -2,8 +2,12 @@
 
 port 2020;  # This is also a comment.
 
-path / StaticHandler {
-  root /foo/bar;
+path /static StaticHandler {
+  root ./test_folder;
+}
+
+path /static2 StaticHandler {
+  root ./test_folder2;
 }
 
 path /echo EchoHandler {}
