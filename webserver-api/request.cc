@@ -18,7 +18,7 @@ using namespace boost::asio;
 
 //class mime_types;
 
-static std::unique_ptr<Request> Request::Parse(const std::string& raw_request)
+std::unique_ptr<Request> Request::Parse(const std::string& raw_request)
 {
 	std::unique_ptr<Request> request(new Request());    
     std::string line, headers, body, rest;
@@ -51,7 +51,7 @@ std::string Request::read_request_line(std::string line)
     ssRequestLine >> uri_;
     ssRequestLine >> version_;
     
-    return uri_;
+    return this->uri_;
 }
 
 bool Request::read_header(std::string headers)
@@ -60,10 +60,10 @@ bool Request::read_header(std::string headers)
   std::string line;
   while(temp_headers.size() != 0)
   {
-    std::size_t line_found = temp_headers.find("\r\n", 0);
-    if (line_found != std::string::npos){
-        line = temp_headers.substr(0, line_found+1);
-	temp_headers = temp_headers.substr(line_found+2);
+    std::size_t header_found = temp_headers.find("\r\n", 0);
+    if (header_found != std::string::npos){
+        line = temp_headers.substr(0, header_found+1);
+	temp_headers = temp_headers.substr(header_found+2);
     }
     std::stringstream ssHeader(line);
 
@@ -82,32 +82,32 @@ bool Request::read_header(std::string headers)
 
 std::string Request::raw_request() const
 {
-    return raw_request_;
+    return this->raw_request_;
 }
 
 std::string Request::method() const
 {
-    return method_;
+    return this->method_;
 }
 
 std::string Request::uri() const
 {
-    return uri_;
+    return this->uri_;
 }
 
 std::string Request::version() const
 {
-    return version_;
+    return this->version_;
 }
 
 std::string Request::body() const
 {
-    return body_;
+    return this->body_;
 }
 
 Headers Request::headers() const
 {
-    return headers_;
+    return this->headers_;
 }
 
 

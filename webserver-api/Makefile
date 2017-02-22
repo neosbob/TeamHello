@@ -37,7 +37,7 @@ config_parser: config_parser.cc config_parser_main.cc
 file_handler_test:
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
 	ar -rv libgtest.a gtest-all.o
-	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread file_handler_test.cc file_handler.cc mime_types.cc mime_types.h ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o file_handler_test -lboost_system
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread file_handler_test.cc file_handler.cc mime_types.cc mime_types.h request.cc request.h response.cc response.h not_found_handler.cc not_found_handler.h ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o file_handler_test -lboost_system
 
 echo_handler_test:
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system

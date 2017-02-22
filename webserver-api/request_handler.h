@@ -13,6 +13,7 @@
 #include "request.h"
 #include "response.h"
 #include "mime_types.h"
+#include "config_parser.h"
 
 // Represents the parent of all request handlers. Implementations should expect to
 // be long lived and created at server constrution.

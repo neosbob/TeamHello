@@ -10,8 +10,6 @@
 #include <cstdlib>
 #include <utility>
 #include "file_handler.h"
-#include "not_found_handler.h"
-#include "config_parser.h"
 
 using namespace boost;
 using namespace boost::system;
@@ -50,6 +48,7 @@ RequestHandler::Status FileHandler::HandleRequest(const Request& request,
 	std::cout << "resource path: " << request_path << std::endl;
       // Open the file to send back.
       std::string full_path = this->root_dir + request_path;
+	std::cout << "full path: " << full_path << std::endl;
       std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
       if (!is)
       {
