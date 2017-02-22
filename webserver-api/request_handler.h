@@ -42,6 +42,8 @@ class RequestHandler {
                                Response* response) = 0;
 };
 
+typedef std::map<const std::string, RequestHandler*> HandlerContainer;
+
 extern std::map<std::string, RequestHandler* (*)(void)>* request_handler_builders;
 template<typename T>
 class RequestHandlerRegisterer {

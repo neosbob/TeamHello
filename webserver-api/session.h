@@ -2,6 +2,7 @@
 #define HTTP_REQUEST_HANDLER_H
 
 #include <boost/asio.hpp>
+#include <boost/array.hpp>
 #include <string>
 #include <memory>
 #include <iostream>
@@ -24,15 +25,19 @@ using namespace boost::asio;
 class session
 {
    asio::streambuf buff;
-   reply_static re_static;
-   reply_echo re_echo;
+   //reply_static re_static;
+   //reply_echo re_echo;
    boost::array<char,8192> buffer_;
+   std::map<std::string, RequestHandler*> handlers;
+   RequestHandler* default_handler;
+
+   RequestHandler* GetRequestHandler(const std::string& path);
 
 public:
    
    static void read_whole_request(std::shared_ptr<session> pThis);
 
-   std::string write_response(Response& response);
+   std::string write_response(Response& response, std::shared_ptr<session> pThis);
 
    char data[4096];
 
@@ -46,14 +51,9 @@ public:
 
    ip::tcp::socket socket;
    
-   session(io_service& io_service, std::map<std::string,std::string> base_dir, std::string echo_path, std::string static_path)
-      :socket(io_service)
-   {
-	this->base_path = base_dir;
-	this->echo_map = echo_path;
-	this->static_map = static_path;
-	
-   }
+   session(io_service& io_service, std::map<std::string, RequestHandler*> mapping, RequestHandler* not_found)
+      :socket(io_service), handlers(mapping), default_handler(not_found)
+   {}
    
    static void read_request(std::shared_ptr<session> pThis);
 };
