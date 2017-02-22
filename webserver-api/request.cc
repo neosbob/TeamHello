@@ -20,7 +20,8 @@ class mime_types;
 
 static unique_ptr<Request> Request::Parse(const std::string& raw_request)
 {
-    
+    auto request = std::make_unique<Request>();
+
     std::string line, headers, body;
     std::size_t line_found = raw_request.find("\r\n", 0);
     if (line_found != std::string::npos){
@@ -33,11 +34,12 @@ static unique_ptr<Request> Request::Parse(const std::string& raw_request)
 	body = rest.substr(body_found+4);
     }
 
-    this->raw_request = raw_request;
-    this->body = body;
-    this->read_request_line(line);
-    this->read_header(headers);
+    request->raw_request = raw_request;
+    request->body = body;
+    request->read_request_line(line);
+    request->read_header(headers);
     
+    return request;
 }
 
 std::string Request::read_request_line(std::string line)
