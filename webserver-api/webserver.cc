@@ -102,9 +102,10 @@ int Server::parseConfig(const NginxConfig& config_out, configArguments& configAr
             std::string header = config_out.statements_[i]->tokens_[0];
             if (header == "path" && config_out.statements_[i]->tokens_[2] == it->first)
             {
-                if (eliminate[it->first].find(config_out.statements_[i]->tokens_[1]) == eliminate.end())
+                std::vector<std::string> temp = eliminate[it->first];
+                if (std::find(temp.begin(), temp.end(), config_out.statements_[i]->tokens_[1]) != temp.end())
                 {
-                    auto handler = RequestHandler::CreateByName(it->first);
+                    auto handler = RequestHandler::CreateByName(it->first.c_str());
                     RequestHandler::Status s = handler->Init(config_out.statements_[i]->tokens_[1], *(config_out.statements_[i]->child_block_.get()));
                     if (s != RequestHandler::Status::OK)
                     {
@@ -144,7 +145,8 @@ int Server::parseConfig(const NginxConfig& config_out, configArguments& configAr
         {
             if (config_out.statements_[i]->tokens_.size() == 2)
             {
-                auto handler = RequestHandler::CreateByName(config_out.statements_[i]->tokens_[1]);
+                std::string handler_name_ = config_out.statements_[i]->tokens_[1];
+                auto handler = RequestHandler::CreateByName(handler_name_.c_str());
                 RequestHandler::Status s = handler->Init("", *(config_out.statements_[i]->child_block_.get()));
                 if (s != RequestHandler::Status::OK)
                 {

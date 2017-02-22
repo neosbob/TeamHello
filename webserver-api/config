@@ -2,11 +2,11 @@
 
 port 2020;  # This is also a comment.
 
-path / StaticHandler {
-  root /foo/bar;
+path /static StaticHandler {
+  root ./test_folder;
 }
 
-path /echo EchoHandler {}
+path /echo EchoHandler;
 
 # Default response handler if no handlers match.
-default NotFoundHandler {}
+default NotFoundHandler;
