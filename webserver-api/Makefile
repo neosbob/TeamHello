@@ -42,7 +42,7 @@ file_handler_test:
 echo_handler_test:
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
 	ar -rv libgtest.a gtest-all.o
-	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread echo_handler_test.cc echo_handler.cc mime_types.cc mime_types.h ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o echo_handler_test -lboost_system
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread echo_handler_test.cc echo_handler.cc request.cc request.h response.cc response.h mime_types.cc mime_types.h ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o echo_handler_test -lboost_system
 
 request_handler_test: 
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system

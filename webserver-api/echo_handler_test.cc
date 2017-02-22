@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "echo_handler.h"
 #include "request.h"
+#include "response.h"
 
 #include <string>
 
@@ -16,7 +17,7 @@ TEST(EchoHandlerTest, HandleRequest)
 	echo_handler.HandleRequest(*req, &resp);
 	std::string resp_Str = resp.ToString();
 
-	std::string expected_string = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 11\r\n\r\ntestcontent";
+	std::string expected_string = "HTTP/1.0 200 OK\r\ncontent-type: text/plain\r\ncontent-length: 11\r\n\r\ntestcontent";
 	EXPECT_EQ(resp_Str, expected_string);
 }
 
