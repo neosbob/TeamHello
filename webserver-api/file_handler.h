@@ -11,12 +11,13 @@
 #include <utility>
 #include <map>
 #include "request_handler.h"
+#include "not_found_handler.h"
 
 // Represents the parent of all request handlers. Implementations should expect to
 // be long lived and created at server constrution.
-class FileHandler : public RequestHandler {
+class StaticHandler : public RequestHandler {
  public:
-  FileHandler(const std::string& directory): root_dir(directory) {}   
+  //StaticHandler(const std::string& directory): root_dir(directory) {}   
   // Initializes the handler. Returns a response code indicating success or
   // failure condition.
   // uri_prefix is the value in the config file that this handler will run for.
@@ -33,6 +34,9 @@ class FileHandler : public RequestHandler {
 
   private:
         std::string root_dir;
+        std::string prefix;
 };
+
+REGISTER_REQUEST_HANDLER(StaticHandler);
 
 #endif

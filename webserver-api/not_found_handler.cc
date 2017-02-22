@@ -19,7 +19,9 @@ class mime_types;
 
 RequestHandler::Status NotFoundHandler::Init(const std::string& uri_prefix,
                       const NginxConfig& config)
-{}
+{
+    return RequestHandler::Status::OK;
+}
 
 RequestHandler::Status NotFoundHandler::HandleRequest(const Request& request,
                                Response* response)

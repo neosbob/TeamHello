@@ -18,12 +18,22 @@ using namespace boost::asio;
 
 class mime_types;
 
-RequestHandler::Status FileHandler::Init(const std::string& uri_prefix,
-                      const NginxConfig& config)
-{}
+RequestHandler::Status StaticHandler::Init(const std::string& uri_prefix,
+                                           const NginxConfig& config)
+{   
+    if (config.statements_[0]->tokens_[0] == "root" && config.statements_[0]->tokens_.size() == 2)
+    {
+        this->root_dir = config.statements_[0]->tokens_[1];
+        this->prefix = uri_prefix;
+        return RequestHandler::Status::OK;
+    }
 
-RequestHandler::Status FileHandler::HandleRequest(const Request& request,
-                               Response* response)
+    return RequestHandler::Status::FAILED;
+    
+}
+
+RequestHandler::Status StaticHandler::HandleRequest(const Request& request,
+                                                    Response* response)
 {
     std::string uri_path = request.uri();
 
@@ -52,7 +62,7 @@ RequestHandler::Status FileHandler::HandleRequest(const Request& request,
       std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
       if (!is)
       {
-         NotFoundHandler not_found_handler("Can't open file.");
+         NotFoundHandler not_found_handler;
          return not_found_handler.HandleRequest(request, response);
       }
 
@@ -72,12 +82,12 @@ RequestHandler::Status FileHandler::HandleRequest(const Request& request,
 
     else if (request_path == "/")
     {
-	NotFoundHandler not_found_handler("No file specified.");
+	NotFoundHandler not_found_handler;
         return not_found_handler.HandleRequest(request, response);	        
     }
 
     else {
-	NotFoundHandler not_found_handler("No handler able to service request.");
+	NotFoundHandler not_found_handler;
         return not_found_handler.HandleRequest(request, response);
     }
 

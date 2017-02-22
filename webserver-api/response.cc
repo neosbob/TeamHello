@@ -58,9 +58,9 @@ std::string Response::ToString()
     response << this->response_status_string;
     for(auto response_h : this->response_header)
     {
-        response << response_h.first << ": " << response_h.second << "/r/n";
+        response << response_h.first << ": " << response_h.second << "\r\n";
     }
-    response << "/r/n";
+    response << "\r\n";
     response << this->content;
     
 

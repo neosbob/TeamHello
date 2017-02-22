@@ -19,7 +19,9 @@ class mime_types;
 
 RequestHandler::Status EchoHandler::Init(const std::string& uri_prefix,
                       const NginxConfig& config)
-{}
+{
+    return RequestHandler::Status::OK;
+}
 
 RequestHandler::Status EchoHandler::HandleRequest(const Request& request,
                                Response* response)

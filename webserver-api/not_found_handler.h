@@ -16,7 +16,7 @@
 // be long lived and created at server constrution.
 class NotFoundHandler : public RequestHandler {
     public:
-        NotFoundHandler(const std::string& reason) : reason_response(reason) {}
+        //NotFoundHandler(const std::string& reason) : reason_response(reason) {}
         // Initializes the handler. Returns a response code indicating success or
         // failure condition.
         // uri_prefix is the value in the config file that this handler will run for.
@@ -34,5 +34,7 @@ class NotFoundHandler : public RequestHandler {
     private:
         std::string reason_response;
 };
+
+REGISTER_REQUEST_HANDLER(NotFoundHandler);
 
 #endif

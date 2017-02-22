@@ -18,11 +18,11 @@ using namespace boost::asio;
 
 class mime_types;
 
-static unique_ptr<Request> Request::Parse(const std::string& raw_request)
+std::unique_ptr<Request> Request::Parse(const std::string& raw_request)
 {
-    auto request = std::make_unique<Request>();
+    std::unique_ptr<Request> request(new Request());
 
-    std::string line, headers, body;
+    std::string line, headers, body, rest;
     std::size_t line_found = raw_request.find("\r\n", 0);
     if (line_found != std::string::npos){
         line = raw_request.substr(0, line_found+1);
@@ -34,8 +34,8 @@ static unique_ptr<Request> Request::Parse(const std::string& raw_request)
 	body = rest.substr(body_found+4);
     }
 
-    request->raw_request = raw_request;
-    request->body = body;
+    request->raw_request_ = raw_request;
+    request->body_ = body;
     request->read_request_line(line);
     request->read_header(headers);
     
@@ -47,12 +47,12 @@ std::string Request::read_request_line(std::string line)
     //This is a check for what url the request wants.
 
     std::stringstream ssRequestLine(line);
-    ssRequestLine >> this->method;
-    ssRequestLine >> this->uri;
-    ssRequestLine >> this->version;
+    ssRequestLine >> this->method_;
+    ssRequestLine >> this->uri_;
+    ssRequestLine >> this->version_;
     
     //std::cout << "request for resource: " << url << std::endl;
-    return uri;
+    return this->uri_;
 }
 
 bool Request::read_header(std::string headers)
@@ -63,8 +63,8 @@ bool Request::read_header(std::string headers)
   {
     std::size_t header_found = temp_headers.find("\r\n", 0);
     if (header_found != std::string::npos){
-        line = temp_headers.substr(0, line_found+1);
-	temp_headers = temp_headers.substr(line_found+2);
+        line = temp_headers.substr(0, header_found+1);
+	temp_headers = temp_headers.substr(header_found+2);
     }
     std::stringstream ssHeader(line);
 
@@ -75,38 +75,38 @@ bool Request::read_header(std::string headers)
     std::getline(ssHeader, value, '\r');
     
     std::pair<std::string, std::string> header_pair(headerName, value);
-    this->headers_.pushback(header_pair);
+    this->headers_.push_back(header_pair);
   }
   return 1;
 	
 }
 
-std::string Request::raw_request()
+std::string Request::raw_request() const
 {
-    return this->raw_request;
+    return this->raw_request_;
 }
 
-std::string Request::method()
+std::string Request::method() const
 {
-    return this->method;
+    return this->method_;
 }
 
-std::string Request::uri()
+std::string Request::uri() const
 {
-    return this->uri;
+    return this->uri_;
 }
 
-std::string Request::version()
+std::string Request::version() const
 {
-    return this->version;
+    return this->version_;
 }
 
-std::string Request::body()  
+std::string Request::body() const
 {
-    return this->body;
+    return this->body_;
 }
 
-Headers Request::headers()
+Headers Request::headers() const
 {
     return this->headers_;
 }
