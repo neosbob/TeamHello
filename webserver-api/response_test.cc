@@ -11,7 +11,7 @@ TEST(ResponseTest, simple_response)
 	response.AddHeader("Content-Type", "text/html");
 	response.SetBody("hello");
 	std::string result = response.ToString();
-	EXPECT_EQ(result, "HTTP/1.0 200 OK\r\nContent-Type: text/html/r/n/r/nhello");
+	EXPECT_EQ(result, "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\nhello");
 
 }
 

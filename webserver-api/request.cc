@@ -33,6 +33,8 @@ std::unique_ptr<Request> Request::Parse(const std::string& raw_request)
 	body = rest.substr(body_found+4);
     }
 
+	std::cout<<"headers"<<headers;
+	std::cout<<"body"<<body;
     request->raw_request_ = raw_request;
     request->body_ = body;
     request->read_request_line(line);
@@ -58,7 +60,7 @@ bool Request::read_header(std::string headers)
 {
   std::string temp_headers = headers;
   std::string line;
-  while(temp_headers.size() != 0)
+  while(temp_headers.size() > 0 && temp_headers!="\r" && temp_headers!="\n")
   {
     std::size_t header_found = temp_headers.find("\r\n", 0);
     if (header_found != std::string::npos){
@@ -69,7 +71,11 @@ bool Request::read_header(std::string headers)
 
     std::string headerName;
     std::getline(ssHeader, headerName, ':');
+	std::cout<<"temp_header size"<<temp_headers.size();
       
+	//skip the white space after colon
+    ssHeader>>std::ws;
+
     std::string value;
     std::getline(ssHeader, value, '\r');
     

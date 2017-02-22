@@ -57,7 +57,7 @@ not_found_handler_test:
 request_test: 
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
 	ar -rv libgtest.a gtest-all.o
-	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread request_test.cc request.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o request_test -lboost_system
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread request_test.cc request.cc response.cc response.h ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o request_test -lboost_system
 
 response_test: 
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
@@ -83,7 +83,7 @@ config_parser_test:
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread config_parser_test.cc config_parser.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o config_parser_test
 
 clean:
-	rm -rf *.o *~ *.gch *.swp *.dSYM *.gcda *.gcno *.gcov config_parser config_parser_test *.tar.gz webserver request_handler.o session.o request_handler_test webserver_test session_test echo_handler_test file_handler_test not_found_handler_test
+	rm -rf *.o *~ *.gch *.swp *.dSYM *.gcda *.gcno *.gcov config_parser config_parser_test *.tar.gz webserver request_handler.o session.o request_handler_test webserver_test session_test echo_handler_test file_handler_test not_found_handler_test response_test request_test
 
 test: clean default
 	./webserver_test
