@@ -77,18 +77,16 @@ RequestHandler::Status StaticHandler::HandleRequest(const Request& request,
       response->AddHeader("content-type", mime.extension_to_type(extension));
       response->AddHeader("content-length", std::to_string(content.length()));
       response->SetBody(content);
-      return RequestHandler::OK;
+      return RequestHandler::Status::OK;
     }
 
     else if (request_path == "/")
     {
-	NotFoundHandler not_found_handler;
-        return not_found_handler.HandleRequest(request, response);	        
+	return RequestHandler::Status::FILE_NOT_FOUND;     
     }
 
     else {
-	NotFoundHandler not_found_handler;
-        return not_found_handler.HandleRequest(request, response);
+	return RequestHandler::Status::FILE_NOT_FOUND;
     }
 
 }

@@ -21,7 +21,8 @@ class RequestHandler {
  public:
   enum Status {
     OK = 0,
-    FAILED = 1
+    FAILED = 1,
+    FILE_NOT_FOUND = 2
     // Define your status codes here.
   };
   

@@ -27,9 +27,25 @@ void session::read_whole_request(std::shared_ptr<session> pThis)
 	  
 	  if(handler != nullptr) {
 	      RequestHandler::Status response_status = handler->HandleRequest(*request, &response);
+	      if (response_status == RequestHandler::Status::FAILED)
+	      {
+                  std::string int_serv_error = "Error Status 500.";
+	          response.SetStatus(Response::internal_server_error);
+                  response.AddHeader("content-type", "text/plain");
+                  response.AddHeader("content-length", std::to_string(int_serv_error.length()));
+                  response.SetBody(int_serv_error);
+              }
+	      else if (response_status == RequestHandler::Status::FILE_NOT_FOUND)
+              {
+                  handler = pThis->default_handler;
+                  RequestHandler::Status response_status = handler->HandleRequest(*request, &response);
+              }
               //std::cout << "hi";
-          }       
-      
+          }
+	  else if (handler == nullptr) {
+	      handler = pThis->default_handler;
+	      RequestHandler::Status response_status = handler->HandleRequest(*request, &response);
+          }    
           
           pThis->write_response(response, pThis);
 
