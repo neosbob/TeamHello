@@ -75,15 +75,21 @@ void session::read_request(std::shared_ptr<session> pThis)
 
 RequestHandler* session::GetRequestHandler(const std::string& path)
 {
-    for(auto& handlerPair: handlers) {
-	std::size_t second_slash_pos = path.find("/", 1);
-	std::string search_path = path.substr(0, second_slash_pos);
-	
-	if ( search_path == handlerPair.first) {
+    std::string temp_path = path;
+    while(temp_path.length() > 0) {
+      for(auto& handlerPair: handlers) {	
+	if (temp_path == handlerPair.first) {
             return handlerPair.second;
         }
+      }
+      std::size_t slash_found = temp_path.find_last_of("/");
+      if (slash_found == 0 && temp_path == "/")
+          break;
+      temp_path = temp_path.substr(0, slash_found);
+      if (slash_found == 0)
+          temp_path = "/";
+      
     }
-
     return nullptr;
 
 }

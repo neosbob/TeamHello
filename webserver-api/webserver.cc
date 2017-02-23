@@ -87,6 +87,7 @@ int Server::parseConfig(const NginxConfig& config_out, configArguments& configAr
 		std::string handler_name_ = config_out.statements_[i]->tokens_[2];
                 auto handler = RequestHandler::CreateByName(handler_name_.c_str());
                 RequestHandler::Status s = handler->Init(config_out.statements_[i]->tokens_[1], *(config_out.statements_[i]->child_block_.get()));
+                //std::cout<<config_out.statements_[i]->tokens_[1];
                 if (s != RequestHandler::OK)
                 {
                     std::cerr << "Error: failed to initialize request handler " << config_out.statements_[i]->tokens_[2] << " for " << config_out.statements_[i]->tokens_[1] << ".\n";

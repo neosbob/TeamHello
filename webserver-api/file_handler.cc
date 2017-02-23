@@ -38,15 +38,16 @@ RequestHandler::Status StaticHandler::HandleRequest(const Request& request,
     std::string uri_path = request.uri();
 
     std::string request_path, static_path, sfile_dir;
-    std::size_t url_found = uri_path.find("/", 1);
+    std::string full_path;
+    std::size_t url_found = uri_path.find(this->prefix, 0);
     if (url_found != std::string::npos){
-        static_path = uri_path.substr(0,url_found);
-	request_path = uri_path.substr(url_found);
+        //static_path = uri_path.substr(0,url_found);
+	request_path = uri_path.erase(url_found, this->prefix.length());
+        //std::cout<< request_path;
     }
-	       
 
     //TODO: Errorchecking for empty file url.
-      
+    
     if (request_path != "/" && request_path != "") {
       // Determine the file extension.
       std::size_t last_slash_pos = request_path.find_last_of("/");
@@ -58,7 +59,10 @@ RequestHandler::Status StaticHandler::HandleRequest(const Request& request,
       }
 	std::cout << "resource path: " << request_path << std::endl;
       // Open the file to send back.
-      std::string full_path = this->root_dir + request_path;
+      if(request_path.substr(0,1) != "/")
+          request_path = "/" + request_path;
+      full_path = this->root_dir + request_path;
+      std::cout<< full_path;
       std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
       if (!is)
       {
