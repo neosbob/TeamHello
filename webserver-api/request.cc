@@ -70,6 +70,9 @@ bool Request::read_header(std::string headers)
 
     std::string headerName;
     std::getline(ssHeader, headerName, ':');
+	
+	//skip the white space
+	ssHeader>>std::ws;
       
     std::string value;
     std::getline(ssHeader, value, '\r');
