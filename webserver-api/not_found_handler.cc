@@ -26,10 +26,11 @@ RequestHandler::Status NotFoundHandler::Init(const std::string& uri_prefix,
 RequestHandler::Status NotFoundHandler::HandleRequest(const Request& request,
                                Response* response)
 {
+    std::string reason = "File Not found or No Handlers to handle uri.";
     response->SetStatus(Response::not_found);
     response->AddHeader("content-type", "text/html");
-    response->AddHeader("content-length", std::to_string(this->reason_response.length()));
-    response->SetBody(this->reason_response);
+    response->AddHeader("content-length", std::to_string(reason.length()));
+    response->SetBody(reason);
     return RequestHandler::OK;
 }
 
