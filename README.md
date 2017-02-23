@@ -169,7 +169,9 @@ In session.cc, request is read from the socket. `GetRequestHandler` is used to d
 ## Test
 
 `make test` to run all unit tests
+
 `make integration_test` to run integration test
+
 `make test_coverage` to run for test coverage 
 
 ## Build
@@ -184,7 +186,7 @@ In session.cc, request is read from the socket. `GetRequestHandler` is used to d
 ## Run
 
 ```
-$ make cleans
+$ make clean
 $ make
 $ ./webserver <config-file>
 ```
