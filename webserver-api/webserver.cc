@@ -56,72 +56,6 @@ void Server::run()
 
 int Server::parseConfig(const NginxConfig& config_out, configArguments& configArgs)
 {
-    // Use longest prefix matching to parse each statement whose header
-    // is "path"
-    // TODO: modify the algorithm so that it's more efficient
-    std::map<std::string, std::vector<std::string> > handlerPathMap;
-    std::map<std::string, std::vector<std::string> > eliminate;
-    for (int i = 0; i < config_out.statements_.size(); i++)
-    {
-        std::string header = config_out.statements_[i]->tokens_[0];
-        if (header == "path")
-        {
-            if (config_out.statements_[i]->tokens_.size() != 3)
-            {
-                std::cerr << "Error: argument is lacking or too much in statement " << i << "\n";
-                return 2;
-            }
-            else
-            {
-                std::string path = config_out.statements_[i]->tokens_[1];
-                std::string requestHandlerName = config_out.statements_[i]->tokens_[2];
-                handlerPathMap[requestHandlerName].push_back(path);
-                //std::cout<<requestHandlerName;
-            }
-        }
-    }
-    for (std::map<std::string, std::vector<std::string> >::iterator it = handlerPathMap.begin(); it != handlerPathMap.end(); ++it)
-    {
-        std::sort(it->second.begin(), it->second.end());
-        for (int i = 0; i < it->second.size() - 1; i++)
-        {
-            if ((it->second)[i] == (it->second)[i + 1])
-            {
-                std::cerr << "Error: there is a repetitive path for request handler " << it->first << ".\n";
-                return 3;
-            }
-            if (it->second[i].size() < it->second[i + 1].size() && it->second[i] == it->second[i + 1].substr(0, it->second[i].size()))
-            {
-                eliminate[it->first].push_back((it->second)[i]);
-                std::cout<<it->first;
-            }
-        }
-    }
-    for (std::map<std::string, std::vector<std::string> >::iterator it = handlerPathMap.begin(); it != handlerPathMap.end(); ++it)
-    {
-        for (int i = 0; i < config_out.statements_.size(); i++)
-        {
-            std::string header = config_out.statements_[i]->tokens_[0];
-		//std::cout<< it->first;
-            if (header == "path" && config_out.statements_[i]->tokens_[2] == it->first)
-            {
-                std::vector<std::string> temp = eliminate[it->first];
-                if (std::find(temp.begin(), temp.end(), config_out.statements_[i]->tokens_[1]) == temp.end())
-                {
-                    auto handler = RequestHandler::CreateByName(it->first.c_str());
-                    
-                    RequestHandler::Status s = handler->Init(config_out.statements_[i]->tokens_[1], *(config_out.statements_[i]->child_block_.get()));
-//std::cout<<s;
-                    if (s != RequestHandler::Status::OK)
-                    {
-                        std::cout << "Error: failed to initialize request handler " << it->first << " for " << config_out.statements_[i]->tokens_[1] << ".\n";
-                        return 4;
-                    }
-                    (configArgs.handlerMapping)[config_out.statements_[i]->tokens_[1]] = handler;
-                }
-            }
-        }
-    }
     
     
     // Parse port and default request handler
@@ -146,6 +80,26 @@ int Server::parseConfig(const NginxConfig& config_out, configArguments& configAr
                 return 6;
             }
         }
+	else if (header == "path")
+	{
+	    if (config_out.statements_[i]->tokens_.size() == 3)
+            {
+		std::string handler_name_ = config_out.statements_[i]->tokens_[2];
+                auto handler = RequestHandler::CreateByName(handler_name_.c_str());
+                RequestHandler::Status s = handler->Init(config_out.statements_[i]->tokens_[1], *(config_out.statements_[i]->child_block_.get()));
+                if (s != RequestHandler::OK)
+                {
+                    std::cerr << "Error: failed to initialize request handler " << config_out.statements_[i]->tokens_[2] << " for " << config_out.statements_[i]->tokens_[1] << ".\n";
+                    return 3;
+                }
+                (configArgs.handlerMapping)[config_out.statements_[i]->tokens_[1]] = handler;
+            }
+            else
+            {
+                std::cerr << "Error: argument is lacking or too much in statement " << i << "\n";
+                return 4;
+            }
+	}
         else if (header == "default")
         {
             if (config_out.statements_[i]->tokens_.size() == 2)
