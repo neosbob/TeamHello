@@ -62,8 +62,7 @@ RequestHandler::Status StaticHandler::HandleRequest(const Request& request,
       std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
       if (!is)
       {
-         NotFoundHandler not_found_handler;
-         return not_found_handler.HandleRequest(request, response);
+         return RequestHandler::Status::FILE_NOT_FOUND; 
       }
 
       // Fill out the reply to be sent to the client.

@@ -26,12 +26,8 @@ TEST(FileHandlerTest, EmptyFile)
 
 	file_handler.Init("/static", config);
 	Response resp;
-	file_handler.HandleRequest(*req, &resp);
-	std::string resp_str = resp.ToString();
-	
-	int RN = resp_str.find("\r\n");
-	EXPECT_EQ(resp_str.substr(0,RN), "HTTP/1.1 404 Not Found");
-
+	RequestHandler::Status response_status = file_handler.HandleRequest(*req, &resp);
+	EXPECT_EQ(response_status, RequestHandler::Status::FILE_NOT_FOUND);
 }
 
 //test with JPG file 
@@ -102,13 +98,9 @@ TEST(FileHandlerTest, JPGFile_notexist)
 	parser.Parse(&config_stream, &config);
 
 	file_handler.Init("/static", config);
-
 	Response resp;
-	file_handler.HandleRequest(*req, &resp);
-	std::string resp_str = resp.ToString();
-	
-	int RN = resp_str.find("\r\n");
-	EXPECT_EQ(resp_str.substr(0,RN), "HTTP/1.1 404 Not Found");
+	RequestHandler::Status response_status = file_handler.HandleRequest(*req, &resp);
+	EXPECT_EQ(response_status, RequestHandler::Status::FILE_NOT_FOUND);
 }
 
 //test with HTML file 
