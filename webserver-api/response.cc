@@ -20,11 +20,11 @@ class mime_types;
 namespace status_string 
 {  
   const std::string ok =
-  "HTTP/1.0 200 OK\r\n";
+  "HTTP/1.1 200 OK\r\n";
   const std::string not_found =
-  "HTTP/1.0 404 Not Found\r\n";
+  "HTTP/1.1 404 Not Found\r\n";
   const std::string int_serv_err =
-  "HTTP/1.0 500 Internal Server Error\r\n";
+  "HTTP/1.1 500 Internal Server Error\r\n";
   
 }
 

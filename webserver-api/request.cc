@@ -59,7 +59,7 @@ bool Request::read_header(std::string headers)
 {
   std::string temp_headers = headers;
   std::string line;
-  while(temp_headers.size() != 0)
+  while(temp_headers.size() > 0 && temp_headers != "\r" && temp_headers != "\n")
   {
     std::size_t header_found = temp_headers.find("\r\n", 0);
     if (header_found != std::string::npos){

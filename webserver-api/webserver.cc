@@ -69,13 +69,14 @@ int Server::parseConfig(const NginxConfig& config_out, configArguments& configAr
             if (config_out.statements_[i]->tokens_.size() != 3)
             {
                 std::cerr << "Error: argument is lacking or too much in statement " << i << "\n";
-                return 4;
+                return 2;
             }
             else
             {
                 std::string path = config_out.statements_[i]->tokens_[1];
                 std::string requestHandlerName = config_out.statements_[i]->tokens_[2];
                 handlerPathMap[requestHandlerName].push_back(path);
+                //std::cout<<requestHandlerName;
             }
         }
     }
@@ -87,11 +88,12 @@ int Server::parseConfig(const NginxConfig& config_out, configArguments& configAr
             if ((it->second)[i] == (it->second)[i + 1])
             {
                 std::cerr << "Error: there is a repetitive path for request handler " << it->first << ".\n";
-                return 5;
+                return 3;
             }
             if (it->second[i].size() < it->second[i + 1].size() && it->second[i] == it->second[i + 1].substr(0, it->second[i].size()))
             {
                 eliminate[it->first].push_back((it->second)[i]);
+                std::cout<<it->first;
             }
         }
     }
@@ -100,19 +102,22 @@ int Server::parseConfig(const NginxConfig& config_out, configArguments& configAr
         for (int i = 0; i < config_out.statements_.size(); i++)
         {
             std::string header = config_out.statements_[i]->tokens_[0];
+		//std::cout<< it->first;
             if (header == "path" && config_out.statements_[i]->tokens_[2] == it->first)
             {
                 std::vector<std::string> temp = eliminate[it->first];
-                if (std::find(temp.begin(), temp.end(), config_out.statements_[i]->tokens_[1]) != temp.end())
+                if (std::find(temp.begin(), temp.end(), config_out.statements_[i]->tokens_[1]) == temp.end())
                 {
                     auto handler = RequestHandler::CreateByName(it->first.c_str());
+                    
                     RequestHandler::Status s = handler->Init(config_out.statements_[i]->tokens_[1], *(config_out.statements_[i]->child_block_.get()));
+//std::cout<<s;
                     if (s != RequestHandler::Status::OK)
                     {
-                        std::cerr << "Error: failed to initialize request handler " << it->first << " for " << config_out.statements_[i]->tokens_[1] << ".\n";
-                        return 8;
+                        std::cout << "Error: failed to initialize request handler " << it->first << " for " << config_out.statements_[i]->tokens_[1] << ".\n";
+                        return 4;
                     }
-                    configArgs.handlerMapping[config_out.statements_[i]->tokens_[1]] = handler;
+                    (configArgs.handlerMapping)[config_out.statements_[i]->tokens_[1]] = handler;
                 }
             }
         }
@@ -125,20 +130,20 @@ int Server::parseConfig(const NginxConfig& config_out, configArguments& configAr
         std::string header = config_out.statements_[i]->tokens_[0];
         if (header == "port")
         {
-            if (config_out.statements_[i]->tokens_.size() > 1 && std::all_of(config_out.statements_[i]->tokens_[1].begin(), config_out.statements_[i]->tokens_[1].end(), ::isdigit))
+            if (config_out.statements_[i]->tokens_.size() == 2 && std::all_of(config_out.statements_[i]->tokens_[1].begin(), config_out.statements_[i]->tokens_[1].end(), ::isdigit))
             {
                 unsigned int tmpPort = std::stoi(config_out.statements_[i]->tokens_[1]);
                 if (tmpPort > 65535 || tmpPort < 0)
                 {
                     std::cerr << "The port number " << tmpPort << " in config file is invalid.\n";
-                    return 2;
+                    return 5;
                 }
                 configArgs.port = (short unsigned int)tmpPort;
             }
             else
             {
                 std::cerr << "Please specify a port number.\n";
-                return 3;
+                return 6;
             }
         }
         else if (header == "default")
@@ -164,7 +169,7 @@ int Server::parseConfig(const NginxConfig& config_out, configArguments& configAr
         else if (header != "path")
         {
             std::cerr << "Error: unrecognized header: " << header << ".\n";
-            return 6;
+            return 9;
         }
     }
     return 0;

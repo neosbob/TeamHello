@@ -28,6 +28,9 @@ class session
    //reply_static re_static;
    //reply_echo re_echo;
    boost::array<char,8192> buffer_;
+   enum{max_length = 8192};
+   char data[max_length];
+
    std::map<std::string, RequestHandler*> handlers;
    RequestHandler* default_handler;
 
@@ -38,8 +41,6 @@ public:
    static void read_whole_request(std::shared_ptr<session> pThis);
 
    std::string write_response(Response& response, std::shared_ptr<session> pThis);
-
-   char data[4096];
 
    size_t length;
 

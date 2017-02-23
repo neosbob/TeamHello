@@ -15,35 +15,41 @@ using namespace boost::asio;
 
 void session::read_whole_request(std::shared_ptr<session> pThis)
 {
-      asio::async_read(pThis->socket, pThis->buff, [pThis](const error_code& e, std::size_t s)
+      pThis->socket.async_read_some(boost::asio::buffer(pThis->data), [pThis](const error_code& e, std::size_t s)
       {
           Response response;
 
-          std::istream stream {&pThis->buff};
-
-          std::string buffer = std::string(std::istreambuf_iterator<char>(stream), {});
+          std::string buffer = std::string(pThis->data, s);
+          //std::cout<< buffer;
           auto request = Request::Parse(buffer);
-
+	  //std::cout << request->uri()<< std::endl;
           RequestHandler* handler = pThis->GetRequestHandler(request->uri());
-
+	  
 	  if(handler != nullptr) {
 	      RequestHandler::Status response_status = handler->HandleRequest(*request, &response);
+              //std::cout << "hi";
           }       
       
           
           pThis->write_response(response, pThis);
+
+          //delete handler;
+          //request.reset(nullptr);
       });
 }
 
 std::string session::write_response(Response& response, std::shared_ptr<session> pThis)
 {
-    std::string response_string = response.ToString();
-    asio::async_write(pThis->socket, boost::asio::buffer(response_string, response_string.length()), [pThis](const error_code& e, std::size_t s)
+    std::shared_ptr<std::string> response_string;
+    response_string = std::make_shared<std::string>(response.ToString());
+    //std::cout<<response_string->c_str()<<std::endl;
+    asio::async_write(pThis->socket, boost::asio::buffer(response_string->c_str(), response_string->length()), [pThis, response_string](const error_code& e, std::size_t s)
     {
-          //return str->c_str();
+          //pThis->socket.shutdown(boost::asio::ip::tcp::socket::shutdown_send);
+          //pThis->socket.close();
     });
 
-    return response_string;
+    return response_string->c_str();
 }
 
 void session::read_request(std::shared_ptr<session> pThis)
