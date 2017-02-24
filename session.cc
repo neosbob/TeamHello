@@ -11,16 +11,16 @@ using namespace boost;
 using namespace boost::system;
 using namespace boost::asio;
 
-session::session(io_service& io_service, std::map<std::string, RequestHandler*> mapping, RequestHandler* not_found, std::fstream& logFile)
+session::session(io_service& io_service, std::map<std::string, RequestHandler*> mapping, RequestHandler* not_found, std::string* ret_log)
 : socket(io_service)
 , handlers(mapping)
 , default_handler(not_found)
-, logFile(logFile)
+, ret_log(ret_log)
 {}
 
 void session::writeToLog(std::string msg)
 {
-    logFile << msg;
+    *ret_log = msg;
 }
 
 void session::read_whole_request(std::shared_ptr<session> pThis)

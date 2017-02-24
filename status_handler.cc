@@ -21,7 +21,6 @@ class mime_types;
 RequestHandler::Status StatusHandler::Init(const std::string& uri_prefix,
                       const NginxConfig& config)
 {
-    std::cout << "hello\n";
     return RequestHandler::Status::OK;
 }
 
@@ -56,19 +55,18 @@ RequestHandler::Status StatusHandler::HandleRequest(const Request& request,
     }
     for (; it2 != response_code_count.end(); ++it2)
     {
-        body = body + it->first + ": " + std::to_string(it->second) + "\n";
+        body = body + it2->first + ": " + std::to_string(it2->second) + "\n";
     }
     body += "\nThe request handlers exist: \n";
-    for (std::map<std::string, std::vector<std::string> >::iterator it = uri_prefix2request_handler_name.begin(); it != uri_prefix2request_handler_name.end(); ++it)
+    for (std::map<std::string, std::vector<std::string> >::iterator it3 = uri_prefix2request_handler_name.begin(); it3 != uri_prefix2request_handler_name.end(); ++it3)
     {
-        body = body + it->first + " has uri prefixes " + it->second[0];
-        for (int i = 1; i < it->second.size(); i++)
+        body = body + it3->first + " has uri prefixes " + it3->second[0];
+        for (int i = 1; i < it3->second.size(); i++)
         {
-            body = body + ", " + it->second[i];
+            body = body + ", " + it3->second[i];
         }
         body += ".\n";
     }
-    
     response->SetStatus(Response::ok);
     response->AddHeader("content-type", "text/plain");
     response->AddHeader("content-length", std::to_string(body.size()));

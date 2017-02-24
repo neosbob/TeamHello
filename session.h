@@ -7,6 +7,7 @@
 #include <memory>
 #include <utility>
 #include <fstream>
+#include <sstream>
 #include "request_handler.h"
 #include "request.h"
 #include "response.h"
@@ -23,7 +24,7 @@ class session
 public:
    static void read_whole_request(std::shared_ptr<session> pThis);
    std::string write_response(Response& response, std::shared_ptr<session> pThis);
-   session(io_service& io_service, std::map<std::string, RequestHandler*> mapping, RequestHandler* not_found, std::fstream& logFile);
+   session(io_service& io_service, std::map<std::string, RequestHandler*> mapping, RequestHandler* not_found, std::string* ret_log);
    static void read_request(std::shared_ptr<session> pThis);
    
    ip::tcp::socket socket;
@@ -36,7 +37,7 @@ private:
 
    std::map<std::string, RequestHandler*> handlers;
    RequestHandler* default_handler;
-   std::fstream& logFile;
+   std::string* ret_log;
 
    RequestHandler* GetRequestHandler(const std::string& path);
    void writeToLog(std::string msg);

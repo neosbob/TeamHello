@@ -7,6 +7,7 @@
 #include "config_parser.h"
 #include "request_handler.h"
 #include <fstream>
+#include <sstream>
 
 #define LOG_FILE_NAME "log.txt"
 
@@ -38,7 +39,9 @@ private:
     boost::asio::ip::tcp::acceptor acceptor;
     configArguments configContent;
     std::map<std::string, std::vector<std::string> > uri_prefix2request_handler_name;
-    std::fstream logFile;
+    std::string log;
+    std::string tmp_log;
+    
     static Server *serverInstance;
 };
 

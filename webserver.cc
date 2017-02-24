@@ -37,15 +37,17 @@ Server::Server(configArguments configArgs, std::map<std::string, std::vector<std
 , acceptor(io_service, ip::tcp::endpoint(ip::tcp::v4(), configArgs.port))
 , configContent(configArgs)
 , uri_prefix2request_handler_name(uri_prefix2request_handler_name)
+, log("")
+, tmp_log("")
 {
     (this->acceptor).listen();
-    logFile.open(LOG_FILE_NAME, std::fstream::in | std::fstream::out | std::fstream::trunc);
     doAccept();
 }
 
 void Server::doAccept()
 {
-    std::shared_ptr<session> sesh = std::make_shared<session>(io_service, configContent.handlerMapping, configContent.defaultHandler, logFile);
+    log += tmp_log;
+    std::shared_ptr<session> sesh = std::make_shared<session>(io_service, configContent.handlerMapping, configContent.defaultHandler, &tmp_log);
     acceptor.async_accept(sesh->socket, [sesh, this](const error_code& accept_error)
     {
         if(!accept_error)
@@ -64,18 +66,19 @@ void Server::run()
 
 std::string Server::constructLogMsg(std::string url, int response_code)
 {
-    return "New request:\nurl requested:" + url + "\nResponse code:" + std::to_string(response_code);
+    return "New request:\nurl requested:" + url + "\nResponse code:" + std::to_string(response_code) + "\n";
 }
 
 std::map<std::string, int> Server::getUrlRequestedCount()
 {
     std::map<std::string, int> counter;
+    std::istringstream f(log);
     std::string line;
-    while (getline(logFile, line))
+    while (std::getline(f, line))
     {
-        if (line.find(":") != std::string::npos && line.substr(0, line.find(":")) == "url requested")
+        if (line.find(":") != std::string::npos && line.substr(0, line.find(":")) == "url requested" && line.find(":") < line.length() - 1)
         {
-            std::string url = line.substr(line.find(":"));
+            std::string url = line.substr(line.find(":") + 1);
             counter[url]++;
         }
     }
@@ -85,15 +88,18 @@ std::map<std::string, int> Server::getUrlRequestedCount()
 std::map<std::string, int> Server::getResponseCodeCount()
 {
     std::map<std::string, int> counter;
+    std::istringstream f(log);
     std::string line;
-    while (getline(logFile, line))
+    while (std::getline(f, line))
     {
-        if (line.find(":") != std::string::npos && line.substr(0, line.find(":")) == "Response code")
+        std::cout << line << "\n";
+        if (line.find(":") != std::string::npos && line.substr(0, line.find(":")) == "Response code" && line.find(":") < line.length() - 1)
         {
-            std::string code = line.substr(line.find(":"));
+            std::string code = line.substr(line.find(":") + 1);
             counter[code]++;
         }
     }
+    std::cout << "counter size: " << counter.size() << "\n";
     return counter;
 }
 
