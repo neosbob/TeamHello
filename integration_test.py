@@ -25,7 +25,7 @@ def testCase1():
     testCasesGenerator("/echo", "GET", "GET /echo HTTP/1.1\r\nHost: localhost:8080\r\nAccept-Encoding: identity\r\n\r\n", 1)
     
 def testCase2():
-    testCasesGenerator("/static/b.txt", "GET", "File Not Found or No Handlers to handle uri.", 2)
+    testCasesGenerator("/static/b.txt", "GET", "File Not found or No Handlers to handle uri.", 2)
     
 def testCase3():
     basePath = ""
