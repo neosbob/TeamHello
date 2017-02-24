@@ -21,6 +21,7 @@ class mime_types;
 RequestHandler::Status StatusHandler::Init(const std::string& uri_prefix,
                       const NginxConfig& config)
 {
+    std::cout << "hello\n";
     return RequestHandler::Status::OK;
 }
 

@@ -8,8 +8,7 @@
 // Represents the parent of all request handlers. Implementations should expect to
 // be long lived and created at server constrution.
 class StatusHandler : public RequestHandler {
- public:
-  //EchoHandler(const std::string& directory);  
+ public: 
   // Initializes the handler. Returns a response code indicating success or
   // failure condition.
   // uri_prefix is the value in the config file that this handler will run for.
