@@ -5,13 +5,10 @@
 #include <boost/array.hpp>
 #include <string>
 #include <memory>
-#include <iostream>
-#include <cstdlib>
 #include <utility>
+#include <fstream>
+#include <sstream>
 #include "request_handler.h"
-#include "echo_handler.h"
-#include "file_handler.h"
-#include "not_found_handler.h"
 #include "request.h"
 #include "response.h"
 
@@ -19,44 +16,31 @@ using namespace boost;
 using namespace boost::system;
 using namespace boost::asio;
 
+const int max_length = 8192;
 
-/// The common handler for all incoming requests.
-
+// The common networking interface for all incoming requests.
 class session
 {
-   asio::streambuf buff;
-   //reply_static re_static;
-   //reply_echo re_echo;
-   boost::array<char,8192> buffer_;
-   enum{max_length = 8192};
+public:
+   static void read_whole_request(std::shared_ptr<session> pThis);
+   std::string write_response(Response& response, std::shared_ptr<session> pThis);
+   session(io_service& io_service, std::map<std::string, RequestHandler*> mapping, RequestHandler* not_found, std::string* ret_log);
+   static void read_request(std::shared_ptr<session> pThis);
+   
+   ip::tcp::socket socket;
    char data[max_length];
+   
+private:
+   //asio::streambuf buff;
+   //boost::array<char,max_length> buffer_;
+   
 
    std::map<std::string, RequestHandler*> handlers;
    RequestHandler* default_handler;
+   std::string* ret_log;
 
    RequestHandler* GetRequestHandler(const std::string& path);
-
-public:
-   
-   static void read_whole_request(std::shared_ptr<session> pThis);
-
-   std::string write_response(Response& response, std::shared_ptr<session> pThis);
-
-   size_t length;
-
-   std::string ss = "";
-
-   std::string echo_map, static_map;
-
-   std::map<std::string, std::string> base_path;
-
-   ip::tcp::socket socket;
-   
-   session(io_service& io_service, std::map<std::string, RequestHandler*> mapping, RequestHandler* not_found)
-      :socket(io_service), handlers(mapping), default_handler(not_found)
-   {}
-   
-   static void read_request(std::shared_ptr<session> pThis);
+   void writeToLog(std::string msg);
 };
 
 

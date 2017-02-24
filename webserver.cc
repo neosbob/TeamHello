@@ -5,30 +5,40 @@
 #include <iostream>
 #include <cstdlib>
 #include <utility>
+#include <fstream>
 #include <algorithm>
+#include "session.h"
 
 using namespace boost;
 using namespace boost::system;
 using namespace boost::asio;
 
-class session;
+Server *Server::serverInstance = nullptr;
 
 Server* Server::serverBuilder(const NginxConfig& config_out)
 {
+    if (serverInstance != nullptr)
+    {
+        return serverInstance;
+    }
     configArguments configContents;
-    int configParsingErrorCode = parseConfig(config_out, configContents);
+    std::map<std::string, std::vector<std::string> > uri_prefix2request_handler_name;
+    int configParsingErrorCode = parseConfig(config_out, configContents, uri_prefix2request_handler_name);
     if (configParsingErrorCode != 0)
     {
         return nullptr;
     }
-    return new Server(configContents);
+    serverInstance = new Server(configContents, uri_prefix2request_handler_name);
+    return serverInstance;
 }
 
-Server::Server(const configArguments& configArgs)
+Server::Server(configArguments configArgs, std::map<std::string, std::vector<std::string> > uri_prefix2request_handler_name)
 : io_service()
 , acceptor(io_service, ip::tcp::endpoint(ip::tcp::v4(), configArgs.port))
 , configContent(configArgs)
-, totalRequestCount(0)
+, uri_prefix2request_handler_name(uri_prefix2request_handler_name)
+, log("")
+, tmp_log("")
 {
     (this->acceptor).listen();
     doAccept();
@@ -36,8 +46,8 @@ Server::Server(const configArguments& configArgs)
 
 void Server::doAccept()
 {
-    totalRequestCount++;
-    std::shared_ptr<session> sesh = std::make_shared<session>(io_service, configContent.handlerMapping, configContent.defaultHandler);
+    log += tmp_log;
+    std::shared_ptr<session> sesh = std::make_shared<session>(io_service, configContent.handlerMapping, configContent.defaultHandler, &tmp_log);
     acceptor.async_accept(sesh->socket, [sesh, this](const error_code& accept_error)
     {
         if(!accept_error)
@@ -54,9 +64,66 @@ void Server::run()
     io_service.run();
 }
 
-int Server::parseConfig(const NginxConfig& config_out, configArguments& configArgs)
+std::string Server::constructLogMsg(std::string url, int response_code)
 {
+    return "New request:\nurl requested:" + url + "\nResponse code:" + std::to_string(response_code) + "\n";
+}
+
+std::map<std::string, int> Server::getUrlRequestedCount()
+{
+    std::map<std::string, int> counter;
+    std::istringstream f(log);
+    std::string line;
+    while (std::getline(f, line))
+    {
+        if (line.find(":") != std::string::npos && line.substr(0, line.find(":")) == "url requested" && line.find(":") < line.length() - 1)
+        {
+            std::string url = line.substr(line.find(":") + 1);
+            counter[url]++;
+        }
+    }
+    return counter;
+}
     
+std::map<std::string, int> Server::getResponseCodeCount()
+{
+    std::map<std::string, int> counter;
+    std::istringstream f(log);
+    std::string line;
+    while (std::getline(f, line))
+    {
+        std::cout << line << "\n";
+        if (line.find(":") != std::string::npos && line.substr(0, line.find(":")) == "Response code" && line.find(":") < line.length() - 1)
+        {
+            std::string code = line.substr(line.find(":") + 1);
+            counter[code]++;
+        }
+    }
+    std::cout << "counter size: " << counter.size() << "\n";
+    return counter;
+}
+
+int Server::parseConfig(const NginxConfig& config_out, configArguments& configArgs, std::map<std::string, std::vector<std::string> >& uri_prefix2request_handler_name)
+{
+    // Return error if there is repetitive uri_prefix
+    std::vector<std::string> checkRepetition;
+    for (int i = 0; i < config_out.statements_.size(); i++)
+    {
+        std::string header = config_out.statements_[i]->tokens_[0];
+        if (header == "path" && config_out.statements_[i]->tokens_.size() == 3)
+        {
+            checkRepetition.push_back(config_out.statements_[i]->tokens_[1]);
+        }
+    }
+    std::sort(checkRepetition.begin(), checkRepetition.end());
+    for (int i = 0; i < checkRepetition.size() - 1; i++)
+    {
+        if (checkRepetition[i] == checkRepetition[i + 1])
+        {
+            std::cerr << "Error: The url prefix " << checkRepetition[i] << " in config file is repetitive.\n";
+            return 9;
+        }
+    }
     
     // Parse port and default request handler
     for (int i = 0; i < config_out.statements_.size(); i++)
@@ -80,27 +147,27 @@ int Server::parseConfig(const NginxConfig& config_out, configArguments& configAr
                 return 6;
             }
         }
-	else if (header == "path")
-	{
-	    if (config_out.statements_[i]->tokens_.size() == 3)
+	    else if (header == "path")
+	    {
+	        if (config_out.statements_[i]->tokens_.size() == 3)
             {
-		std::string handler_name_ = config_out.statements_[i]->tokens_[2];
+	            std::string handler_name_ = config_out.statements_[i]->tokens_[2];
                 auto handler = RequestHandler::CreateByName(handler_name_.c_str());
                 RequestHandler::Status s = handler->Init(config_out.statements_[i]->tokens_[1], *(config_out.statements_[i]->child_block_.get()));
-                //std::cout<<config_out.statements_[i]->tokens_[1];
                 if (s != RequestHandler::OK)
                 {
                     std::cerr << "Error: failed to initialize request handler " << config_out.statements_[i]->tokens_[2] << " for " << config_out.statements_[i]->tokens_[1] << ".\n";
                     return 3;
                 }
                 (configArgs.handlerMapping)[config_out.statements_[i]->tokens_[1]] = handler;
+                uri_prefix2request_handler_name[handler_name_].push_back(config_out.statements_[i]->tokens_[1]);
             }
             else
             {
                 std::cerr << "Error: argument is lacking or too much in statement " << i << "\n";
                 return 4;
             }
-	}
+	    }
         else if (header == "default")
         {
             if (config_out.statements_[i]->tokens_.size() == 2)
@@ -121,7 +188,7 @@ int Server::parseConfig(const NginxConfig& config_out, configArguments& configAr
                 return 8;
             }
         }
-        else if (header != "path")
+        else
         {
             std::cerr << "Error: unrecognized header: " << header << ".\n";
             return 9;

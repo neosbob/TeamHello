@@ -8,7 +8,7 @@ import re
 
 HOSTNAME = "localhost"
 PORT = 8080
-CONFIGFILENAME = "SimpleConfig"
+CONFIGFILENAME = "config"
 
 def testCasesGenerator(url, method, expected_body, case_number):
     connection = httplib.HTTPConnection(HOSTNAME, PORT)
@@ -25,7 +25,7 @@ def testCase1():
     testCasesGenerator("/echo", "GET", "GET /echo HTTP/1.1\r\nHost: localhost:8080\r\nAccept-Encoding: identity\r\n\r\n", 1)
     
 def testCase2():
-    testCasesGenerator("/static/b.txt", "GET", "<html><body><p>File not found, can't open.</p></body></html>", 2)
+    testCasesGenerator("/static/b.txt", "GET", "File Not Found or No Handlers to handle uri.", 2)
     
 def testCase3():
     basePath = ""
@@ -46,7 +46,7 @@ def testCase3():
 
 def main():
     
-    Popen(["./webserver", "SimpleConfig"])
+    Popen(["./webserver", CONFIGFILENAME])
     pid = check_output(["pidof", "-s", "./webserver"])
     testCase1()
     testCase2()
