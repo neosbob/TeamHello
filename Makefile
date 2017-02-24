@@ -4,7 +4,7 @@ CXXFLAGS= -g -Wall -pthread -std=c++11 $(CXXOPTIMIZE)
 GTEST_DIR=googletest/googletest
 SERVERCLASSES=config_parser.cc
 
-default:  config_parser config_parser_test request_handler.o echo_handler.o file_handler.o not_found_handler.o request.o response.o mime_types.o session.o  echo_handler_test file_handler_test not_found_handler_test response_test request_test webserver
+default:  config_parser config_parser_test request_handler.o echo_handler.o file_handler.o not_found_handler.o status_handler.o request.o response.o mime_types.o session.o  echo_handler_test file_handler_test not_found_handler_test response_test request_test webserver
 
 file_handler.o: file_handler.cc file_handler.h request_handler.h mime_types.h mime_types.cc response.cc response.h request.cc request.h
 	g++ -c -std=c++11 file_handler.cc -lboost_system
@@ -14,6 +14,9 @@ echo_handler.o: echo_handler.cc echo_handler.h request_handler.h mime_types.h mi
 
 not_found_handler.o: not_found_handler.cc not_found_handler.h request_handler.h mime_types.h mime_types.cc response.cc response.h request.cc request.h
 	g++ -c -std=c++11 not_found_handler.cc -lboost_system
+	
+status_handler.o: status_handler.cc status_handler.h request_handler.h mime_types.h mime_types.cc response.cc response.h request.cc request.h
+	g++ -c -std=c++11 status_handler.cc -lboost_system
 
 request.o: request.cc request.h
 	g++ -c -std=c++11 request.cc -lboost_system
@@ -21,13 +24,13 @@ request.o: request.cc request.h
 response.o: response.cc response.h 
 	g++ -c -std=c++11 response.cc -lboost_system
 
-session.o: session.cc session.h request_handler.h echo_handler.h file_handler.h response.cc response.h request.cc request.h
+session.o: session.cc session.h request_handler.h echo_handler.h file_handler.h status_handler.h response.cc response.h request.cc request.h webserver.h
 	g++ -c -std=c++11 session.cc  -lboost_system
 
 mime_types.o: mime_types.cc mime_types.h
 	g++ -c -std=c++11 mime_types.cc
 
-webserver: webserver.h webserver.cc webserver_main.cc config_parser.h config_parser.cc session.h request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o request.o response.o
+webserver: webserver.h webserver.cc webserver_main.cc config_parser.h config_parser.cc session.h request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o status_handler.o request.o response.o
 	g++ webserver.h webserver.cc webserver_main.cc config_parser.cc request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o request.o response.o -I /usr/local/Cellar/boost/1.54.0/include -std=c++11 -lboost_system -o webserver
 
 
