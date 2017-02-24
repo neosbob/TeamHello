@@ -108,7 +108,7 @@ test_coverage:
 
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
 	ar -rv libgtest.a gtest-all.o
-	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread file_handler_test.cc file_handler.cc file_handler.h request_handler.cc request_handler.h mime_types.cc mime_types.h request.cc request.h response.cc response.h not_found_handler.cc not_found_handler.h config_parser.cc config_parser.h ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o file_handler_test -lboost_system -fprofile-arcs -ftest-coverage
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread file_handler_test.cc file_handler.cc request_handler.cc request_handler.h mime_types.cc mime_types.h request.cc request.h response.cc response.h not_found_handler.cc not_found_handler.h config_parser.cc config_parser.h ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o file_handler_test -lboost_system -fprofile-arcs -ftest-coverage
 	./file_handler_test; gcov -r file_handler.cc
 
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
@@ -128,7 +128,7 @@ test_coverage:
 
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
 	ar -rv libgtest.a gtest-all.o
-	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread session_test.cc request_handler.cc request_handler.h session.cc session.h mime_types.cc file_handler.cc echo_handler.cc not_found_handler.cc request.cc response.cc webserver.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o session_test -lboost_system -fprofile-arcs -ftest-coverage
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread session_test.cc request_handler.cc session.cc mime_types.cc file_handler.cc echo_handler.cc not_found_handler.cc request.cc response.cc webserver.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o session_test -lboost_system -fprofile-arcs -ftest-coverage
 	./session_test; gcov -r session.cc
 
 
