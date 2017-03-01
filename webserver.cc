@@ -57,7 +57,7 @@ Server::Server(configArguments configArgs, std::map<std::string, std::vector<std
     acceptor.listen();
     
     std::fstream logFile(configContent.logFileName, std::ios::in | std::ios::out | std::ios::trunc);
-    fstream << "";
+    logFile << "";
     logFile.close();
     
     doAccept();
