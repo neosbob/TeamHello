@@ -16,7 +16,7 @@ not_found_handler.o: not_found_handler.cc not_found_handler.h request_handler.h 
 	g++ -c -std=c++11 not_found_handler.cc -lboost_system
 	
 status_handler.o: status_handler.cc status_handler.h request_handler.h mime_types.h mime_types.cc response.cc response.h request.cc request.h
-	g++ -c -std=c++11 status_handler.cc -lboost_system
+	g++ -c -std=c++11 status_handler.cc -lboost_system -lboost_thread
 
 request.o: request.cc request.h
 	g++ -c -std=c++11 request.cc -lboost_system
@@ -25,13 +25,13 @@ response.o: response.cc response.h
 	g++ -c -std=c++11 response.cc -lboost_system
 
 session.o: session.cc session.h request_handler.h echo_handler.h file_handler.h status_handler.h response.cc response.h request.cc request.h webserver.h
-	g++ -c -std=c++11 session.cc  -lboost_system
+	g++ -c -std=c++11 session.cc  -lboost_system -lboost_thread
 
 mime_types.o: mime_types.cc mime_types.h
 	g++ -c -std=c++11 mime_types.cc
 
 webserver: webserver.h webserver.cc webserver_main.cc config_parser.h config_parser.cc session.h request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o status_handler.o request.o response.o
-	g++ webserver.h webserver.cc webserver_main.cc config_parser.cc request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o status_handler.o request.o response.o -I /usr/local/Cellar/boost/1.54.0/include -std=c++11 -lboost_system -o webserver
+	g++ webserver.h webserver.cc webserver_main.cc config_parser.cc request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o status_handler.o request.o response.o -I /usr/local/Cellar/boost/1.54.0/include -std=c++11 -pthread -lboost_system -lboost_thread -o webserver
 
 
 config_parser: config_parser.cc config_parser_main.cc
@@ -74,7 +74,7 @@ response_test:
 session_test:
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
 	ar -rv libgtest.a gtest-all.o
-	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread session_test.cc request_handler.cc request_handler.h session.cc session.h mime_types.cc file_handler.cc echo_handler.cc not_found_handler.cc request.cc response.cc webserver.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o session_test -lboost_system
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread session_test.cc request_handler.cc request_handler.h session.cc session.h mime_types.cc file_handler.cc echo_handler.cc not_found_handler.cc request.cc response.cc webserver.h webserver.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o session_test -lboost_system -lboost_thread
 
 webserver_test:
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system

@@ -1,19 +1,21 @@
 #include "webserver.h"
-#include <string>
 #include <memory>
-#include <vector>
 #include <iostream>
 #include <cstdlib>
 #include <utility>
-#include <fstream>
 #include <algorithm>
 #include "session.h"
+#include <boost/thread.hpp>
+#include <boost/bind.hpp>
+#include <boost/shared_ptr.hpp>
+#include <fstream>
 
 using namespace boost;
 using namespace boost::system;
 using namespace boost::asio;
 
 Server *Server::serverInstance = nullptr;
+boost::mutex Server::mtx;
 
 Server* Server::serverBuilder(const NginxConfig& config_out)
 {
@@ -34,20 +36,36 @@ Server* Server::serverBuilder(const NginxConfig& config_out)
 
 Server::Server(configArguments configArgs, std::map<std::string, std::vector<std::string> > uri_prefix2request_handler_name)
 : io_service()
-, acceptor(io_service, ip::tcp::endpoint(ip::tcp::v4(), configArgs.port))
+, signals(io_service)
+, acceptor(io_service)
 , configContent(configArgs)
 , uri_prefix2request_handler_name(uri_prefix2request_handler_name)
-, log("")
-, tmp_log("")
 {
-    (this->acceptor).listen();
+    signals.add(SIGINT);
+    signals.add(SIGTERM);
+#if defined(SIGQUIT)
+    signals.add(SIGQUIT);
+#endif // defined(SIGQUIT)
+    signals.async_wait(boost::bind(&Server::stop, this));
+
+    ip::tcp::resolver resolver(io_service);
+    ip::tcp::resolver::query query(IPADDR, std::to_string(configArgs.port));
+    ip::tcp::endpoint endpoint = *resolver.resolve(query);
+    acceptor.open(endpoint.protocol());
+    acceptor.set_option(ip::tcp::acceptor::reuse_address(true));
+    acceptor.bind(endpoint);
+    acceptor.listen();
+    
+    std::fstream logFile(configContent.logFileName, std::ios::in | std::ios::out | std::ios::trunc);
+    fstream << "";
+    logFile.close();
+    
     doAccept();
 }
 
 void Server::doAccept()
 {
-    log += tmp_log;
-    std::shared_ptr<session> sesh = std::make_shared<session>(io_service, configContent.handlerMapping, configContent.defaultHandler, &tmp_log);
+    std::shared_ptr<session> sesh = std::make_shared<session>(io_service, configContent.handlerMapping, configContent.defaultHandler, configContent.logFileName);
     acceptor.async_accept(sesh->socket, [sesh, this](const error_code& accept_error)
     {
         if(!accept_error)
@@ -60,8 +78,22 @@ void Server::doAccept()
 
 void Server::run()
 {
-    std::cout<<"Server is running!\n";
-    io_service.run();
+    std::vector<boost::shared_ptr<boost::thread> > threads;
+    for (std::size_t i = 0; i < configContent.numOfThreads; i++)
+    {
+        boost::shared_ptr<boost::thread> thread(new boost::thread(boost::bind(&boost::asio::io_service::run, &io_service)));
+        threads.push_back(thread);
+    }
+    
+    for (std::size_t i = 0; i < configContent.numOfThreads; i++)
+    {
+        threads[i]->join();
+    }
+}
+
+void Server::stop()
+{
+    io_service.stop();
 }
 
 std::string Server::constructLogMsg(std::string url, int response_code)
@@ -69,38 +101,32 @@ std::string Server::constructLogMsg(std::string url, int response_code)
     return "New request:\nurl requested:" + url + "\nResponse code:" + std::to_string(response_code) + "\n";
 }
 
-std::map<std::string, int> Server::getUrlRequestedCount()
+void Server::getStats(std::map<std::string, int>& urlRequestedCount, std::map<std::string, int>& ResponseCodeCount)
 {
-    std::map<std::string, int> counter;
-    std::istringstream f(log);
+    boost::lock_guard<boost::mutex> guard(mtx);
     std::string line;
-    while (std::getline(f, line))
+    std::ifstream logFile(configContent.logFileName);
+    while (std::getline(logFile, line))
     {
         if (line.find(":") != std::string::npos && line.substr(0, line.find(":")) == "url requested" && line.find(":") < line.length() - 1)
         {
             std::string url = line.substr(line.find(":") + 1);
-            counter[url]++;
+            urlRequestedCount[url]++;
         }
     }
-    return counter;
-}
+    logFile.close();
     
-std::map<std::string, int> Server::getResponseCodeCount()
-{
-    std::map<std::string, int> counter;
-    std::istringstream f(log);
-    std::string line;
-    while (std::getline(f, line))
+    logFile.open(configContent.logFileName);
+    while (std::getline(logFile, line))
     {
         std::cout << line << "\n";
         if (line.find(":") != std::string::npos && line.substr(0, line.find(":")) == "Response code" && line.find(":") < line.length() - 1)
         {
             std::string code = line.substr(line.find(":") + 1);
-            counter[code]++;
+            ResponseCodeCount[code]++;
         }
     }
-    std::cout << "counter size: " << counter.size() << "\n";
-    return counter;
+    logFile.close();
 }
 
 int Server::parseConfig(const NginxConfig& config_out, configArguments& configArgs, std::map<std::string, std::vector<std::string> >& uri_prefix2request_handler_name)
@@ -186,6 +212,30 @@ int Server::parseConfig(const NginxConfig& config_out, configArguments& configAr
             {
                 std::cerr << "Error: wrong format for default request handler.\n";
                 return 8;
+            }
+        }
+        else if (header == "num_threads")
+        {
+            if (config_out.statements_[i]->tokens_.size() == 2 && std::all_of(config_out.statements_[i]->tokens_[1].begin(), config_out.statements_[i]->tokens_[1].end(), ::isdigit))
+            {
+                configArgs.numOfThreads = std::stoi(config_out.statements_[i]->tokens_[1]);
+            }
+            else
+            {
+                std::cerr << "Please specify the number of threads.\n";
+                return 11;
+            }
+        }
+        else if (header == "log_file_name")
+        {
+            if (config_out.statements_[i]->tokens_.size() == 2)
+            {
+                configArgs.logFileName = config_out.statements_[i]->tokens_[1];
+            }
+            else
+            {
+                std::cerr << "Please specify the log file name.\n";
+                return 12;
             }
         }
         else

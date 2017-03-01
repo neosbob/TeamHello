@@ -33,8 +33,8 @@ RequestHandler::Status StatusHandler::HandleRequest(const Request& request,
     {
         return RequestHandler::FAILED;
     }
-    std::map<std::string, int> url_requested_count = server->getUrlRequestedCount();
-    std::map<std::string, int> response_code_count = server->getResponseCodeCount();
+    std::map<std::string, int> url_requested_count, response_code_count;
+    server->getStats(url_requested_count, response_code_count);
     std::map<std::string, std::vector<std::string> > uri_prefix2request_handler_name = server->getUriPrefixRequestHandlerMap();
     body += "Some statistics about this server: \n";
     body += "url requested count: \n";
