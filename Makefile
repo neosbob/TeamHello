@@ -30,8 +30,8 @@ session.o: session.cc session.h request_handler.h echo_handler.h file_handler.h 
 mime_types.o: mime_types.cc mime_types.h
 	g++ -c -std=c++11 mime_types.cc
 
-webserver: webserver.h webserver.cc webserver_main.cc config_parser.h config_parser.cc session.h request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o status_handler.o request.o response.o
-	g++ webserver.h webserver.cc webserver_main.cc config_parser.cc request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o status_handler.o request.o response.o -I /usr/local/Cellar/boost/1.54.0/include -std=c++11 -lboost_system -o webserver
+webserver: webserver.h webserver.cc webserver_main.cc config_parser.h config_parser.cc session.h request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o status_handler.o request.o response.o http_client.o proxy_handler.o
+	g++ webserver.h webserver.cc webserver_main.cc config_parser.cc request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o status_handler.o request.o response.o http_client.o proxy_handler.o -I /usr/local/Cellar/boost/1.54.0/include -std=c++11 -lboost_system -pthread -o webserver
 
 
 config_parser: config_parser.cc config_parser_main.cc
