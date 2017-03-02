@@ -10,6 +10,7 @@
 #include <string>
 
 #define IPADDR "127.0.0.1"
+#define DEFAULTLOGFILENAME "log.txt"
 
 struct configArguments
 {
@@ -24,13 +25,24 @@ struct configArguments
 class Server
 {
 public:
+    enum parseConfigCode
+    {
+          NO_ERROR
+        , PORT_INVALID
+        , PORT_MISSING
+        , REPETITIVE_URI_PREFIX
+        , HANDLER_INITIALIZATION_ERROR
+        , WRONG_NUM_ARGUMENT
+        , WRONG_NUM_THREAD
+        , MISSING_LOG_FILE_NAME
+    };
     static Server *serverBuilder(const NginxConfig& config_out);
     void run();
     void stop();
     void getStats(std::map<std::string, int>& urlRequestedCount, std::map<std::string, int>& ResponseCodeCount);
     std::map<std::string, std::vector<std::string> > getUriPrefixRequestHandlerMap(){return this->uri_prefix2request_handler_name;}
     static Server *getServerInstance(){return serverInstance;}
-    static int parseConfig(const NginxConfig& config_out, configArguments& configArgs, std::map<std::string, std::vector<std::string> >& uri_prefix2request_handler_name);
+    static parseConfigCode parseConfig(const NginxConfig& config_out, configArguments& configArgs, std::map<std::string, std::vector<std::string> >& uri_prefix2request_handler_name);
     static std::string constructLogMsg(std::string url, int response_code);
     static boost::mutex mtx;
 	

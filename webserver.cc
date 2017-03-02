@@ -25,8 +25,8 @@ Server* Server::serverBuilder(const NginxConfig& config_out)
     }
     configArguments configContents;
     std::map<std::string, std::vector<std::string> > uri_prefix2request_handler_name;
-    int configParsingErrorCode = parseConfig(config_out, configContents, uri_prefix2request_handler_name);
-    if (configParsingErrorCode != 0)
+    parseConfigCode configParsingErrorCode = parseConfig(config_out, configContents, uri_prefix2request_handler_name);
+    if (configParsingErrorCode != Server::NO_ERROR)
     {
         return nullptr;
     }
@@ -119,7 +119,6 @@ void Server::getStats(std::map<std::string, int>& urlRequestedCount, std::map<st
     logFile.open(configContent.logFileName);
     while (std::getline(logFile, line))
     {
-        std::cout << line << "\n";
         if (line.find(":") != std::string::npos && line.substr(0, line.find(":")) == "Response code" && line.find(":") < line.length() - 1)
         {
             std::string code = line.substr(line.find(":") + 1);
@@ -129,8 +128,11 @@ void Server::getStats(std::map<std::string, int>& urlRequestedCount, std::map<st
     logFile.close();
 }
 
-int Server::parseConfig(const NginxConfig& config_out, configArguments& configArgs, std::map<std::string, std::vector<std::string> >& uri_prefix2request_handler_name)
+Server::parseConfigCode Server::parseConfig(const NginxConfig& config_out, configArguments& configArgs, std::map<std::string, std::vector<std::string> >& uri_prefix2request_handler_name)
 {
+    Server::parseConfigCode errorCode = NO_ERROR;
+    std::string logMsg = "";
+    bool logFileNameGet = false;
     // Return error if there is repetitive uri_prefix
     std::vector<std::string> checkRepetition;
     for (int i = 0; i < config_out.statements_.size(); i++)
@@ -146,8 +148,10 @@ int Server::parseConfig(const NginxConfig& config_out, configArguments& configAr
     {
         if (checkRepetition[i] == checkRepetition[i + 1])
         {
-            std::cerr << "Error: The url prefix " << checkRepetition[i] << " in config file is repetitive.\n";
-            return 9;
+            std::fstream logFile(DEFAULTLOGFILENAME, std::ios::in | std::ios::out | std::ios::app);
+            logFile << "Error: The url prefix " << checkRepetition[i] << " in config file is repetitive.\n";
+            logFile.close();
+            return REPETITIVE_URI_PREFIX;
         }
     }
     
@@ -162,15 +166,17 @@ int Server::parseConfig(const NginxConfig& config_out, configArguments& configAr
                 unsigned int tmpPort = std::stoi(config_out.statements_[i]->tokens_[1]);
                 if (tmpPort > 65535 || tmpPort < 0)
                 {
-                    std::cerr << "The port number " << tmpPort << " in config file is invalid.\n";
-                    return 5;
+                    logMsg = "The port number " + std::to_string(tmpPort) + " in config file is invalid.\n";
+                    errorCode = PORT_INVALID;
+                    break;
                 }
                 configArgs.port = (short unsigned int)tmpPort;
             }
             else
             {
-                std::cerr << "Please specify a port number.\n";
-                return 6;
+                logMsg = "Please specify a port number.\n";
+                errorCode = PORT_MISSING;
+                break;
             }
         }
 	    else if (header == "path")
@@ -182,16 +188,18 @@ int Server::parseConfig(const NginxConfig& config_out, configArguments& configAr
                 RequestHandler::Status s = handler->Init(config_out.statements_[i]->tokens_[1], *(config_out.statements_[i]->child_block_.get()));
                 if (s != RequestHandler::OK)
                 {
-                    std::cerr << "Error: failed to initialize request handler " << config_out.statements_[i]->tokens_[2] << " for " << config_out.statements_[i]->tokens_[1] << ".\n";
-                    return 3;
+                    logMsg = "Error: failed to initialize request handler " + config_out.statements_[i]->tokens_[2] + " for " + config_out.statements_[i]->tokens_[1] + ".\n";
+                    errorCode = HANDLER_INITIALIZATION_ERROR;
+                    break;
                 }
                 (configArgs.handlerMapping)[config_out.statements_[i]->tokens_[1]] = handler;
                 uri_prefix2request_handler_name[handler_name_].push_back(config_out.statements_[i]->tokens_[1]);
             }
             else
             {
-                std::cerr << "Error: argument is lacking or too much in statement " << i << "\n";
-                return 4;
+                logMsg = "Error: argument is lacking or too much in statement " + std::to_string(i) + "\n";
+                errorCode = WRONG_NUM_ARGUMENT;
+                break;
             }
 	    }
         else if (header == "default")
@@ -203,15 +211,17 @@ int Server::parseConfig(const NginxConfig& config_out, configArguments& configAr
                 RequestHandler::Status s = handler->Init("", *(config_out.statements_[i]->child_block_.get()));
                 if (s != RequestHandler::Status::OK)
                 {
-                    std::cerr << "Error: failed to initialize the default hanlder " << config_out.statements_[i]->tokens_[1] << ".\n";
-                    return 7;
+                    logMsg = "Error: failed to initialize the default hanlder " + config_out.statements_[i]->tokens_[1] + ".\n";
+                    errorCode = HANDLER_INITIALIZATION_ERROR;
+                    break;
                 }
                 configArgs.defaultHandler = handler;
             }
             else
             {
-                std::cerr << "Error: wrong format for default request handler.\n";
-                return 8;
+                logMsg = "Error: wrong format for default request handler.\n";
+                errorCode = WRONG_NUM_ARGUMENT;
+                break;
             }
         }
         else if (header == "num_threads")
@@ -222,8 +232,9 @@ int Server::parseConfig(const NginxConfig& config_out, configArguments& configAr
             }
             else
             {
-                std::cerr << "Please specify the number of threads.\n";
-                return 11;
+                logMsg = "Please specify the number of threads.\n";
+                errorCode = WRONG_NUM_THREAD;
+                break;
             }
         }
         else if (header == "log_file_name")
@@ -231,18 +242,27 @@ int Server::parseConfig(const NginxConfig& config_out, configArguments& configAr
             if (config_out.statements_[i]->tokens_.size() == 2)
             {
                 configArgs.logFileName = config_out.statements_[i]->tokens_[1];
+                logFileNameGet = true;
             }
             else
             {
-                std::cerr << "Please specify the log file name.\n";
-                return 12;
+                logMsg = "Please specify the log file name.\n";
+                errorCode = MISSING_LOG_FILE_NAME;
+                break;
             }
         }
-        else
-        {
-            std::cerr << "Error: unrecognized header: " << header << ".\n";
-            return 9;
-        }
     }
-    return 0;
+    if (logFileNameGet)
+    {
+        std::fstream logFile(configArgs.logFileName, std::ios::in | std::ios::out | std::ios::app);
+        logFile << logMsg;
+        logFile.close();
+    }
+    else
+    {
+        std::fstream logFile(DEFAULTLOGFILENAME, std::ios::in | std::ios::out | std::ios::app);
+        logFile << logMsg;
+        logFile.close();
+    }
+    return errorCode;
 }
