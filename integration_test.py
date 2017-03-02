@@ -5,6 +5,7 @@ import os
 import signal
 import filecmp
 import re
+import subprocess
 import time
 
 HOSTNAME = "localhost"
@@ -45,6 +46,20 @@ def testCase3():
     testCasesGenerator("/static/b.txt", "GET", "abcde", 3)
     os.remove(basePath + "/b.txt")
 
+def testCase4():
+    curl_proc = subprocess.call(["curl", "-s", "localhost:8080", "-o", "output1"])
+    curl_proc = subprocess.call(["curl", "-s", "my.ucla.edu", "-o", "output2"])
+    diff_proc = subprocess.Popen(["diff", "-u", "output1", "output2"], stdout=subprocess.PIPE)
+    diff = diff_proc.stdout.read().decode('utf-8')
+    os.remove('output1')
+    os.remove('output2')
+    if diff != '':
+        print "Case4 failed!"
+        print diff
+        exit(1)
+    else:
+        print "Case4 passed!"
+
 def main():
     
     Popen(["./webserver", CONFIGFILENAME])
@@ -53,6 +68,7 @@ def main():
     testCase1()
     testCase2()
     testCase3()
+    testCase4()
     
     os.kill(int(pid), signal.SIGKILL)
     
