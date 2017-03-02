@@ -35,6 +35,8 @@ RequestHandler::Status ProxyHandler::HandleRequest(const Request& request,
         std::cout << "send host request: " << raw_request << "\n";
         auto resp = std::move(client.ObtainResponse());
         std::cout << "receive host response\n";
+
+        // redirect
         while (resp->GetResponseCode() == Response::moved_temporarily) {
             std::string location = "";
             for(auto& header: resp->GetHeaders()) {

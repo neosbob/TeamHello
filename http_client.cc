@@ -41,13 +41,20 @@ std::unique_ptr<Response> HTTPClient::ObtainResponse() {
     boost::asio::streambuf resp;
     std::unique_ptr<Response> response;
     boost::system::error_code error;
+
+    // read until receiving all headers
     boost::asio::read_until(socket_, resp, "\r\n\r\n");
     std::string str( (std::istreambuf_iterator<char>(&resp)), std::istreambuf_iterator<char>() );
     response = Response::ParseHeader(str);
+
+    // read rest of response
     while (boost::asio::read(socket_, resp, boost::asio::transfer_at_least(1), error)) {
         if (error) break;
     }
     std::string body( (std::istreambuf_iterator<char>(&resp)), std::istreambuf_iterator<char>() );
+    
+    // combine str and body together and then find the true body part of response
+    // because str contains some stream of body part of response where "\r\n\r\n" is in
     std::string whole = str+body;
     body = whole.substr(whole.find("\r\n\r\n")+4);
     response->SetBody(body);
