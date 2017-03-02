@@ -87,7 +87,7 @@ config_parser_test:
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread config_parser_test.cc config_parser.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o config_parser_test
 
 clean:
-	rm -rf *.o *~ *.gch *.swp *.dSYM *.gcda *.gcno *.gcov config_parser config_parser_test *.tar.gz webserver request_handler.o session.o request_handler_test webserver_test session_test echo_handler_test file_handler_test response_test request_test not_found_handler_test session_test
+	rm -rf *.o *~ *.gch *.swp *.dSYM *.gcda *.gcno *.gcov config_parser config_parser_test *.tar.gz webserver request_handler.o session.o request_handler_test webserver_test session_test echo_handler_test file_handler_test response_test request_test not_found_handler_test session_test http_client_test proxy_handler_test
 
 test: clean default
 	./echo_handler_test
@@ -131,5 +131,9 @@ test_coverage:
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread session_test.cc request_handler.cc session.cc mime_types.cc file_handler.cc echo_handler.cc not_found_handler.cc request.cc response.cc webserver.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o session_test -lboost_system -fprofile-arcs -ftest-coverage
 	./session_test; gcov -r session.cc
 
-
+http_client_test:
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
+	ar -rv libgtest.a gtest-all.o
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread http_client_test.cc http_client.cc response.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o http_client_test -lboost_system -fprofile-arcs -ftest-coverage
+	./http_client_test; gcov -r http_client.cc
 	
