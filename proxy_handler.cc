@@ -35,10 +35,7 @@ RequestHandler::Status ProxyHandler::HandleRequest(const Request& request,
         std::cout << "send host request: " << raw_request << "\n";
         auto resp = std::move(client.ObtainResponse());
         std::cout << "receive host response\n";
-        //int count = 0;
         while (resp->GetResponseCode() == Response::moved_temporarily) {
-            //std::cout<<"redirect count "<<count<<std::endl;
-            //count++;
             std::string location = "";
             for(auto& header: resp->GetHeaders()) {
                 if (header.first == redirect_header_) {
@@ -71,7 +68,6 @@ RequestHandler::Status ProxyHandler::HandleRequest(const Request& request,
             response->AddHeader(header.first, header.second);
         }
         response->SetBody(resp->GetBody());
-        //std::cout<<"line 71"<<std::endl;
     } catch (std::exception& e) {
         std::cout << e.what();
         return FAILED;
