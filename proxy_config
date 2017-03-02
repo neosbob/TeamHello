@@ -1,7 +1,7 @@
 port 8090;
 
 path / ProxyHandler {
-	host my.ucla.edu;	
+	host usc.edu;	
 }
 
 default NotFoundHandler {
