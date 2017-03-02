@@ -116,6 +116,7 @@ test_coverage:
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread not_found_handler_test.cc not_found_handler.cc request_handler.cc request_handler.h mime_types.cc mime_types.h request.cc request.h response.cc response.h file_handler.cc file_handler.h config_parser.cc config_parser.h ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o not_found_handler_test -lboost_system -fprofile-arcs -ftest-coverage
 	./not_found_handler_test; gcov -r not_found_handler.cc
 
+response_test_coverage:
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
 	ar -rv libgtest.a gtest-all.o
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread response_test.cc response.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o response_test -lboost_system -fprofile-arcs -ftest-coverage
