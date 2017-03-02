@@ -114,6 +114,9 @@ integration_test: clean default
 
 reverse_proxy_integration_test: webserver
 	python integration_test_proxy.py
+
+reverse_proxy_302_test: webserver
+	python reverse_proxy_302.py
 	
 test_coverage:
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
