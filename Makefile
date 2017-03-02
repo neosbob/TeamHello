@@ -111,6 +111,7 @@ test: clean default
 
 integration_test: clean default
 	python integration_test.py
+	python integration_test_proxy.py
 	
 test_coverage:
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
