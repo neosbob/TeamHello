@@ -5,6 +5,7 @@ import os
 import signal
 import filecmp
 import re
+import time
 
 HOSTNAME = "localhost"
 PORT = 8080
@@ -47,6 +48,7 @@ def testCase3():
 def main():
     
     Popen(["./webserver", CONFIGFILENAME])
+    time.sleep(0.01)
     pid = check_output(["pidof", "-s", "./webserver"])
     testCase1()
     testCase2()

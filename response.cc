@@ -42,6 +42,7 @@ void Response::SetStatus(const ResponseCode response_code)
             this->response_status_string = status_string::int_serv_err;
             break;
     }
+    response_code_ = response_code;
 }
 void Response::AddHeader(const std::string& header_name, const std::string& header_value)
 {
@@ -65,4 +66,52 @@ std::string Response::ToString()
     
 
     return response.str();
+}
+
+char Response::space = ' ';
+std::string Response::header_separator = "\r\n";
+
+std::vector<std::pair<std::string, std::string>> Response::GetHeaders() {
+    return response_header;
+}
+
+Response::ResponseCode Response::GetResponseCode() {
+    return response_code_;
+}
+
+std::string Response::GetBody() {
+    return content;
+}
+
+std::unique_ptr<Response> Response::ParseHeader(std::string header) {
+    auto response = std::unique_ptr<Response>(new Response());
+    size_t pos = 0, prev = 0;
+
+    // separate status line and headers
+    pos = header.find(header_separator);
+    std::string status_line = header.substr(0, pos);
+    header = header.substr(pos+2);
+
+    // parse status line
+    pos = status_line.find(space, prev);
+    prev = pos + 1;
+    pos = status_line.find(space, prev);
+    response->SetStatus(static_cast<ResponseCode >(std::stoi(status_line.substr(prev, pos-prev))));
+
+    // parse headers
+    prev = 0;
+    size_t mid;
+    std::string line, head_, content_;
+    while ((pos = header.find(header_separator, prev)) != std::string::npos) {
+        line = header.substr(prev, pos-prev);
+        if (line.length() == 0) break;
+        prev = pos + header_separator.length();
+        mid = line.find(":");
+        head_ = line.substr(0, mid);
+        content_ = line.substr(mid+1);
+        content_ = content_.substr(content_.find_first_not_of(' '));
+        response->AddHeader(head_, content_);
+    }
+
+    return response;
 }
