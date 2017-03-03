@@ -3,6 +3,7 @@
 #include "session.h"
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 using namespace boost;
 using namespace boost::system;
@@ -48,8 +49,8 @@ TEST_F(RequestTest, write_response)
 	std::map<std::string, std::string> url_map;
 	std::map<std::string, RequestHandler*> mapping;
 	RequestHandler* not_found;
-	std::string* ret_log;
-	std::shared_ptr<session> sesh = std::make_shared<session>(io_service, mapping, not_found, ret_log);
+	std::string logFileName = "log.txt";
+	std::shared_ptr<session> sesh = std::make_shared<session>(io_service, mapping, not_found, logFileName);
 	io_service.run();
 
 	char data[] = "Hello\r\n";

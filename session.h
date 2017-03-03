@@ -3,11 +3,10 @@
 
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
+#include <boost/thread/mutex.hpp>
 #include <string>
 #include <memory>
 #include <utility>
-#include <fstream>
-#include <sstream>
 #include "request_handler.h"
 #include "request.h"
 #include "response.h"
@@ -24,20 +23,16 @@ class session
 public:
    static void read_whole_request(std::shared_ptr<session> pThis);
    std::string write_response(Response& response, std::shared_ptr<session> pThis);
-   session(io_service& io_service, std::map<std::string, RequestHandler*> mapping, RequestHandler* not_found, std::string* ret_log);
+   session(io_service& io_service, std::map<std::string, RequestHandler*> mapping, RequestHandler* not_found, std::string logFileName);
    static void read_request(std::shared_ptr<session> pThis);
    
    ip::tcp::socket socket;
    char data[max_length];
    
 private:
-   //asio::streambuf buff;
-   //boost::array<char,max_length> buffer_;
-   
-
    std::map<std::string, RequestHandler*> handlers;
    RequestHandler* default_handler;
-   std::string* ret_log;
+   std::string logFileName;
 
    RequestHandler* GetRequestHandler(const std::string& path);
    void writeToLog(std::string msg);

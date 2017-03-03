@@ -2,25 +2,30 @@
 //www.boost.org/doc/libs/1_43_0/doc/html/boost_asio/example/http/client/async_client.cpp
 
 #include <boost/asio.hpp>
+#include <boost/thread.hpp>
 #include <iostream>
 #include <cstdlib>
 #include "session.h"
 #include "webserver.h"
+#include <fstream>
 
 using namespace boost;
 using namespace boost::system;
 using namespace boost::asio;
 
-session::session(io_service& io_service, std::map<std::string, RequestHandler*> mapping, RequestHandler* not_found, std::string* ret_log)
+session::session(io_service& io_service, std::map<std::string, RequestHandler*> mapping, RequestHandler* not_found, std::string logFileName)
 : socket(io_service)
 , handlers(mapping)
 , default_handler(not_found)
-, ret_log(ret_log)
+, logFileName(logFileName)
 {}
 
 void session::writeToLog(std::string msg)
 {
-    *ret_log = msg;
+    boost::lock_guard<boost::mutex> guard(Server::mtx);
+    std::ofstream log(logFileName, std::ios::out | std::ios::app);
+    log << msg;
+    log.close();
 }
 
 void session::read_whole_request(std::shared_ptr<session> pThis)
