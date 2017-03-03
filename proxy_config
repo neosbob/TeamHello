@@ -1,5 +1,13 @@
 port 8090;
 
+num_threads 4;
+
+log_file_name log.txt;
+
+path /static StaticHandler {
+  root ./test_folder;
+}
+
 path / ProxyHandler {
 	host my.ucla.edu;	
 }
