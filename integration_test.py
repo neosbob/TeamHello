@@ -6,6 +6,7 @@ import os
 import signal
 import filecmp
 import re
+import time
 
 HOSTNAME = "localhost"
 PORT = 8080
@@ -76,7 +77,7 @@ def multiThreadingTestCase():
     else:
         print "Error: multi-threading test case is not passed!"
 
-def main():
+def main()
     subprocess.call(["make"])
     testCase1()
     testCase2()

@@ -4,7 +4,7 @@ CXXFLAGS= -g -Wall -pthread -std=c++11 $(CXXOPTIMIZE)
 GTEST_DIR=googletest/googletest
 SERVERCLASSES=config_parser.cc
 
-default:  config_parser config_parser_test request_handler.o echo_handler.o file_handler.o not_found_handler.o status_handler.o request.o response.o mime_types.o session.o  echo_handler_test file_handler_test not_found_handler_test response_test request_test session_test webserver
+default:  config_parser config_parser_test request_handler.o echo_handler.o file_handler.o not_found_handler.o status_handler.o request.o response.o mime_types.o session.o  echo_handler_test file_handler_test not_found_handler_test response_test request_test session_test http_client_test proxy_handler_test webserver
 
 file_handler.o: file_handler.cc file_handler.h request_handler.h mime_types.h mime_types.cc response.cc response.h request.cc request.h
 	g++ -c -std=c++11 file_handler.cc -lboost_system
@@ -30,8 +30,8 @@ session.o: session.cc session.h request_handler.h echo_handler.h file_handler.h 
 mime_types.o: mime_types.cc mime_types.h
 	g++ -c -std=c++11 mime_types.cc
 
-webserver: webserver.h webserver.cc webserver_main.cc config_parser.h config_parser.cc session.h request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o status_handler.o request.o response.o
-	g++ webserver.h webserver.cc webserver_main.cc config_parser.cc request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o status_handler.o request.o response.o -I /usr/local/Cellar/boost/1.54.0/include -std=c++11 -pthread -lboost_system -lboost_thread -o webserver
+webserver: webserver.h webserver.cc webserver_main.cc config_parser.h config_parser.cc session.h request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o status_handler.o request.o response.o http_client.o proxy_handler.o
+	g++ webserver.h webserver.cc webserver_main.cc config_parser.cc request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o status_handler.o request.o response.o http_client.o proxy_handler.o -I /usr/local/Cellar/boost/1.54.0/include -std=c++11 -lboost_system -pthread -lboost_thread -o webserver
 
 
 config_parser: config_parser.cc config_parser_main.cc
@@ -86,8 +86,18 @@ config_parser_test:
 	ar -rv libgtest.a gtest-all.o
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread config_parser_test.cc config_parser.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o config_parser_test
 
+http_client_test:
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
+	ar -rv libgtest.a gtest-all.o
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread http_client_test.cc http_client.cc proxy_handler.cc session.cc config_parser.cc request_handler.cc file_handler.cc not_found_handler.cc request.cc webserver.cc mime_types.cc response.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o http_client_test -lboost_system -fprofile-arcs -ftest-coverage
+
+proxy_handler_test:
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
+	ar -rv libgtest.a gtest-all.o
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread proxy_handler_test.cc proxy_handler.cc session.cc http_client.cc not_found_handler.cc mime_types.cc config_parser.cc request_handler.cc file_handler.cc request.cc response.cc webserver.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o proxy_handler_test -lboost_system -fprofile-arcs -ftest-coverage
+
 clean:
-	rm -rf *.o *~ *.gch *.swp *.dSYM *.gcda *.gcno *.gcov config_parser config_parser_test *.tar.gz webserver request_handler.o session.o request_handler_test webserver_test session_test echo_handler_test file_handler_test response_test request_test not_found_handler_test session_test
+	rm -rf *.o *.a *~ *.gch *.swp *.dSYM *.gcda *.gcno *.gcov config_parser config_parser_test *.tar.gz webserver request_handler.o session.o request_handler_test webserver_test session_test echo_handler_test file_handler_test response_test request_test not_found_handler_test session_test http_client_test proxy_handler_test
 
 test: clean default
 	./echo_handler_test
@@ -96,9 +106,17 @@ test: clean default
 	./request_test
 	./not_found_handler_test
 	./session_test
+	./http_client_test
+	./proxy_handler_test
 
 integration_test: clean default
 	python integration_test.py
+
+reverse_proxy_integration_test: webserver
+	python integration_test_proxy.py
+
+reverse_proxy_302_test: webserver
+	python reverse_proxy_302.py
 	
 test_coverage:
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
@@ -131,5 +149,13 @@ test_coverage:
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread session_test.cc request_handler.cc session.cc mime_types.cc file_handler.cc echo_handler.cc not_found_handler.cc request.cc response.cc webserver.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o session_test -lboost_system -fprofile-arcs -ftest-coverage
 	./session_test; gcov -r session.cc
 
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
+	ar -rv libgtest.a gtest-all.o
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread http_client_test.cc http_client.cc proxy_handler.cc session.cc config_parser.cc request_handler.cc file_handler.cc not_found_handler.cc request.cc webserver.cc mime_types.cc response.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o http_client_test -lboost_system -fprofile-arcs -ftest-coverage
+	./http_client_test; gcov -r http_client.cc
 
-	
+proxy_handler_unit_test:
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
+	ar -rv libgtest.a gtest-all.o
+	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread proxy_handler_test.cc proxy_handler.cc session.cc http_client.cc not_found_handler.cc mime_types.cc config_parser.cc request_handler.cc file_handler.cc request.cc response.cc webserver.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o proxy_handler_test -lboost_system -fprofile-arcs -ftest-coverage
+	./proxy_handler_test; gcov -r proxy_handler.cc
