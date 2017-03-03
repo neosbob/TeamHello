@@ -59,7 +59,7 @@ def multiThreadingTestCase():
     sleep(3)
     connection = httplib.HTTPConnection(HOSTNAME, PORT)
     connection2 = httplib.HTTPConnection(HOSTNAME, PORT)
-    connection.putrequest("GET", "/echo") # This will send only the request line to the server
+    connection.putrequest("GET", "/echo") # This will send only the request line to the server. So the request is not complete
     connection2.request("GET", "/static/b.txt")
     response2 = connection2.getresponse()
     body2 = response2.read()
