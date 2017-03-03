@@ -77,7 +77,7 @@ def multiThreadingTestCase():
     else:
         print "Error: multi-threading test case is not passed!"
 
-def main()
+def main():
     subprocess.call(["make"])
     testCase1()
     testCase2()
