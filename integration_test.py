@@ -38,6 +38,8 @@ def testCase2():
     testCasesGenerator("/static/b.txt", "GET", "File Not found or No Handlers to handle uri.", 2)
     
 def testCase3():
+    # this test case first create a text file in the root path
+    # and then request this text file through localhost.
     basePath = ""
     configFile = open(CONFIGFILENAME, 'r')
     for line in configFile:
@@ -54,6 +56,9 @@ def testCase3():
     os.remove(basePath + "/b.txt")
     
 def multiThreadingTestCase():
+    # this test case first send a partial request(only the request line
+    # of the http request), then send another complete request. Finally
+    # finish the incomplete request
     print "Multi-threading test: "
     serverProcess = Process(target=serverExec)
     serverProcess.start()
