@@ -6,7 +6,7 @@ RUN apt-get install -y g++
 
 WORKDIR /opt/webserver
 COPY . /opt/webserver
-RUN make clean && make webserver
+RUN make clean && make
 
 EXPOSE 8080:8080
 CMD ["./webserver","config"]
