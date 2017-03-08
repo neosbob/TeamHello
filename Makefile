@@ -4,7 +4,7 @@ CXXFLAGS= -g -Wall -pthread -std=c++11 $(CXXOPTIMIZE)
 GTEST_DIR=googletest/googletest
 SERVERCLASSES=config_parser.cc
 
-default:  config_parser config_parser_test request_handler.o echo_handler.o file_handler.o not_found_handler.o status_handler.o request.o response.o mime_types.o session.o webserver
+default:  config_parser request_handler.o echo_handler.o file_handler.o not_found_handler.o status_handler.o request.o response.o mime_types.o session.o webserver
 
 build: Dockerfile
 	docker build -t webserver.build .
@@ -108,7 +108,7 @@ proxy_handler_test:
 clean:
 	rm -rf *.o *.a *~ *.gch *.swp *.dSYM *.gcda *.gcno *.gcov config_parser config_parser_test *.tar.gz webserver request_handler.o session.o request_handler_test webserver_test session_test echo_handler_test file_handler_test response_test request_test not_found_handler_test session_test http_client_test proxy_handler_test
 
-test: clean echo_handler_test file_handler_test not_found_handler_test response_test request_test session_test http_client_test proxy_handler_test
+test: clean config_parser_test echo_handler_test file_handler_test not_found_handler_test response_test request_test session_test http_client_test proxy_handler_test
 	./echo_handler_test
 	./file_handler_test
 	./response_test
@@ -117,6 +117,7 @@ test: clean echo_handler_test file_handler_test not_found_handler_test response_
 	./session_test
 	./http_client_test
 	./proxy_handler_test
+	./config_parser_test
 
 integration_test: clean default
 	python integration_test.py
