@@ -6,6 +6,25 @@ SERVERCLASSES=config_parser.cc
 
 default:  config_parser config_parser_test request_handler.o echo_handler.o file_handler.o not_found_handler.o status_handler.o request.o response.o mime_types.o session.o  echo_handler_test file_handler_test not_found_handler_test response_test request_test session_test http_client_test proxy_handler_test webserver
 
+build: Dockerfile
+	docker build -t webserver.build .
+	docker run --rm webserver.build > webserver.tar
+
+deploy: Dockerfile.run webserver.tar
+	rm -rf deploy/
+	mkdir deploy/
+	cp webserver.tar deploy/
+	cp Dockerfile.run deploy/
+	cp config deploy/
+	cp -r test_folder/ deploy/
+
+	cd deploy
+	tar -xf webserver.tar
+	chmod 0755 webserver
+	docker build -f Dockerfile.run -t webserver.deploy .
+	docker run --rm -t -p 8080:8080 webserver.deploy
+	
+
 file_handler.o: file_handler.cc file_handler.h request_handler.h mime_types.h mime_types.cc response.cc response.h request.cc request.h
 	g++ -c -std=c++11 file_handler.cc -lboost_system
 
@@ -31,7 +50,7 @@ mime_types.o: mime_types.cc mime_types.h
 	g++ -c -std=c++11 mime_types.cc
 
 webserver: webserver.h webserver.cc webserver_main.cc config_parser.h config_parser.cc session.h request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o status_handler.o request.o response.o http_client.o proxy_handler.o
-	g++ webserver.h webserver.cc webserver_main.cc config_parser.cc request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o status_handler.o request.o response.o http_client.o proxy_handler.o -I /usr/local/Cellar/boost/1.54.0/include -std=c++11 -lboost_system -pthread -lboost_thread -o webserver
+	g++ webserver.h webserver.cc webserver_main.cc config_parser.cc request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o status_handler.o request.o response.o http_client.o proxy_handler.o -I /usr/local/Cellar/boost/1.54.0/include -std=c++11 -static-libgcc -static-libstdc++ -pthread -Wl,-Bstatic -lboost_thread -lboost_system -o webserver
 
 
 config_parser: config_parser.cc config_parser_main.cc
