@@ -10,7 +10,8 @@ build: Dockerfile
 	docker build -t webserver.build .
 	docker run --rm webserver.build > deploy/webserver.tar
 
-deploy2: deploy/Dockerfile.run deploy/webserver.tar
+#deploy will not work if a .pem for the server is not in the work_dir.
+deploy: deploy/Dockerfile.run deploy/webserver.tar
 	tar -xf deploy/webserver.tar --directory deploy/       
 	chmod 0755 deploy/webserver
 	
