@@ -10,12 +10,16 @@ build: Dockerfile
 	docker build -t webserver.build .
 	docker run --rm webserver.build > deploy/webserver.tar
 
-deploy: deploy/Dockerfile.run deploy/webserver.tar
+deploy2: deploy/Dockerfile.run deploy/webserver.tar
 	tar -xf deploy/webserver.tar --directory deploy/       
 	chmod 0755 deploy/webserver
 	
+	#This builds the shruken image.
 	cd deploy && docker build -f Dockerfile.run -t webserver.deploy .
-	docker run --rm -t -p 8080:8080 webserver.deploy
+	#The following copies the image to the AWS-ec2
+	docker save webserver.deploy | bzip2 | pv | ssh -i CS130-TeamHello-Assign8-ec2.pem ec2-user@ec2-54-201-90-157.us-west-2.compute.amazonaws.com 'bunzip2 | docker load'
+	#The following runs make using the new image on AWS-ec2 server
+	ssh -i CS130-TeamHello-Assign8-ec2.pem ec2-user@ec2-54-201-90-157.us-west-2.compute.amazonaws.com 'make deploy'
 
 file_handler.o: file_handler.cc file_handler.h request_handler.h mime_types.h mime_types.cc response.cc response.h request.cc request.h
 	g++ -c -std=c++11 file_handler.cc -lboost_system
