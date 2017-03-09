@@ -195,3 +195,23 @@ In chrome browser:
 `localhost::<port>/<uri_prefix>/<file_name>`
 
 `<file_name>` is optional. It depends on the type of handler. 
+
+## Deployment
+
+`make build` to build and run webserver in docker
+
+`make deploy` to  automate the deployment
+
+This `deploy` target builds the shrunken image, copies the image to the AWS-ec2, and runs make using the new image on AWS-ec2 server. 
+
+`make deploy` will return an error if a .pem for the server is not in the working directory. Because private key should not appear in a public environment like github, .pem file is not included here. Contact the collaborators for a demo on the `make deploy` command to show the automation for deployment. 
+
+* Our AWS server is on 
+```
+IPv4 Public IP:
+54.201.90.157
+```
+
+To access our server, one can simply type `http://54.201.90.157/` and will see the UCLA homepage or any page specified in config file. 
+
+

@@ -1,0 +1,26 @@
+# This is a comment.
+
+port 8080;  # This is also a comment.
+
+num_threads 4;
+
+log_file_name log.txt;
+
+path /static StaticHandler {
+  root ./test_folder;
+}
+
+path /static2 StaticHandler {
+  root ./test_folder2;
+}
+
+path /echo EchoHandler {}
+
+path /status StatusHandler {}
+
+path / ProxyHandler {
+	host ucla.edu;
+}
+
+# Default response handler if no handlers match.
+default NotFoundHandler {}

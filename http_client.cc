@@ -5,7 +5,7 @@ HTTPClient::HTTPClient(): io_service_(), socket_(io_service_)
 }
 
 HTTPClient::~HTTPClient() {
-    socket_.shutdown(tcp::socket::shutdown_both);
+    //socket_.shutdown(tcp::socket::shutdown_both);
 }
 
 bool HTTPClient::Connect(std::string host, std::string port) {

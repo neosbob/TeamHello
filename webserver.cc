@@ -49,7 +49,8 @@ Server::Server(configArguments configArgs, std::map<std::string, std::vector<std
     signals.async_wait(boost::bind(&Server::stop, this));
 
     ip::tcp::resolver resolver(io_service);
-    ip::tcp::resolver::query query(IPADDR, std::to_string(configArgs.port));
+    ip::tcp::resolver::query query("0.0.0.0", std::to_string(configArgs.port));
+    std::cout<<IPADDR<<std::endl;
     ip::tcp::endpoint endpoint = *resolver.resolve(query);
     acceptor.open(endpoint.protocol());
     acceptor.set_option(ip::tcp::acceptor::reuse_address(true));

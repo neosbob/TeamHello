@@ -4,7 +4,23 @@ CXXFLAGS= -g -Wall -pthread -std=c++11 $(CXXOPTIMIZE)
 GTEST_DIR=googletest/googletest
 SERVERCLASSES=config_parser.cc
 
-default:  config_parser config_parser_test request_handler.o echo_handler.o file_handler.o not_found_handler.o status_handler.o request.o response.o mime_types.o session.o  echo_handler_test file_handler_test not_found_handler_test response_test request_test session_test http_client_test proxy_handler_test webserver
+default:  config_parser request_handler.o echo_handler.o file_handler.o not_found_handler.o status_handler.o request.o response.o mime_types.o session.o webserver
+
+build: Dockerfile
+	docker build -t webserver.build .
+	docker run --rm webserver.build > deploy/webserver.tar
+
+#deploy will not work if a .pem for the server is not in the work_dir.
+deploy: deploy/Dockerfile.run deploy/webserver.tar
+	tar -xf deploy/webserver.tar --directory deploy/       
+	chmod 0755 deploy/webserver
+	
+	#This builds the shruken image.
+	cd deploy && docker build -f Dockerfile.run -t webserver.deploy .
+	#The following copies the image to the AWS-ec2
+	docker save webserver.deploy | bzip2 | pv | ssh -i CS130-TeamHello-Assign8-ec2.pem ec2-user@ec2-54-201-90-157.us-west-2.compute.amazonaws.com 'bunzip2 | docker load'
+	#The following runs make using the new image on AWS-ec2 server
+	ssh -i CS130-TeamHello-Assign8-ec2.pem ec2-user@ec2-54-201-90-157.us-west-2.compute.amazonaws.com 'make deploy'
 
 file_handler.o: file_handler.cc file_handler.h request_handler.h mime_types.h mime_types.cc response.cc response.h request.cc request.h
 	g++ -c -std=c++11 file_handler.cc -lboost_system
@@ -31,7 +47,7 @@ mime_types.o: mime_types.cc mime_types.h
 	g++ -c -std=c++11 mime_types.cc
 
 webserver: webserver.h webserver.cc webserver_main.cc config_parser.h config_parser.cc session.h request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o status_handler.o request.o response.o http_client.o proxy_handler.o
-	g++ webserver.h webserver.cc webserver_main.cc config_parser.cc request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o status_handler.o request.o response.o http_client.o proxy_handler.o -I /usr/local/Cellar/boost/1.54.0/include -std=c++11 -lboost_system -pthread -lboost_thread -o webserver
+	g++ webserver.h webserver.cc webserver_main.cc config_parser.cc request_handler.o session.o mime_types.o file_handler.o echo_handler.o not_found_handler.o status_handler.o request.o response.o http_client.o proxy_handler.o -I /usr/local/Cellar/boost/1.54.0/include -std=c++11 -static-libgcc -static-libstdc++ -pthread -Wl,-Bstatic -lboost_thread -lboost_system -o webserver
 
 
 config_parser: config_parser.cc config_parser_main.cc
@@ -69,8 +85,6 @@ response_test:
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -pthread response_test.cc response.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o response_test -lboost_system
 
 
-
-
 session_test:
 	g++ -std=c++11 -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc -lboost_system
 	ar -rv libgtest.a gtest-all.o
@@ -99,7 +113,7 @@ proxy_handler_test:
 clean:
 	rm -rf *.o *.a *~ *.gch *.swp *.dSYM *.gcda *.gcno *.gcov config_parser config_parser_test *.tar.gz webserver request_handler.o session.o request_handler_test webserver_test session_test echo_handler_test file_handler_test response_test request_test not_found_handler_test session_test http_client_test proxy_handler_test
 
-test: clean default
+test: clean config_parser_test echo_handler_test file_handler_test not_found_handler_test response_test request_test session_test http_client_test proxy_handler_test
 	./echo_handler_test
 	./file_handler_test
 	./response_test
@@ -108,6 +122,7 @@ test: clean default
 	./session_test
 	./http_client_test
 	./proxy_handler_test
+	./config_parser_test
 
 integration_test: clean default
 	python integration_test.py
