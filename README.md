@@ -198,11 +198,11 @@ In chrome browser:
 
 ## Deployment
 
-`make build` to build and run webserver in docker
+`make build` builds the large image file into a tar file using Dockerfile, then it saves that tar file as webserver.tar 
 
 `make deploy` to  automate the deployment
 
-This `deploy` target builds the shrunken image, copies the image to the AWS-ec2, and runs make using the new image on AWS-ec2 server. 
+This `deploy` extracts `webserver` into the `deploy` directory, and it goes into the directory `deploy` and builds the shrunken image using the files in directory `deploy`. Then, it copies the image to the AWS-ec2, and runs `make` using the new image on AWS-ec2 server. 
 
 `make deploy` will return an error if a .pem for the server is not in the working directory. Because private key should not appear in a public environment like github, .pem file is not included here. Contact the collaborators for a demo on the `make deploy` command to show the automation for deployment. 
 
