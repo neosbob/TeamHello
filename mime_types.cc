@@ -12,7 +12,8 @@ struct mapping
   { "html", "text/html" },
   { "jpg", "image/jpeg" },
   { "png", "image/png" },
-  { "jpeg", "image/jpeg"}
+  { "jpeg", "image/jpeg"},
+	{ "md", "text/markdown"}
 };
 
 std::string mime_types::extension_to_type(const std::string& extension)

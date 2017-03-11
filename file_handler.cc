@@ -11,6 +11,7 @@
 #include <utility>
 #include "file_handler.h"
 #include "not_found_handler.h"
+#include "cpp-markdown/markdown.h"
 
 using namespace boost;
 using namespace boost::system;
@@ -77,9 +78,40 @@ RequestHandler::Status StaticHandler::HandleRequest(const Request& request,
           content.append(buf, is.gcount());
 
       response->SetStatus(Response::ok);
-      response->AddHeader("content-type", mime.extension_to_type(extension));
-      response->AddHeader("content-length", std::to_string(content.length()));
-      response->SetBody(content);
+			//get the content type
+			std::string extension_type = mime.extension_to_type(extension);
+
+			//check if the content type is markdown. set to html
+			if (extension_type == "text/markdown")
+			{
+				response->AddHeader("content-type", "text/html");
+			}
+			else
+			{
+      	response->AddHeader("content-type", extension_type);
+      	response->AddHeader("content-length", std::to_string(content.length()));
+			}
+
+			//set response body
+			if (extension_type == "text/markdown")
+			{
+				markdown::Document doc;
+				doc.read(content);
+				std::ostringstream stream;
+				doc.write(stream);
+
+				std::string markdown = stream.str();
+
+				
+
+				response->AddHeader("content-length",std::to_string(markdown.length()));
+				response->SetBody(markdown);
+			}
+			else
+			{
+				response->SetBody(content);
+			}
+			
       return RequestHandler::Status::OK;
     }
 
