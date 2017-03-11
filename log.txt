@@ -1,9 +1,3 @@
 New request:
 url requested:/static/markdown_sample.md
 Response code:200
-New request:
-url requested:/status
-Response code:200
-New request:
-url requested:/static/markdown_sample.md
-Response code:200
