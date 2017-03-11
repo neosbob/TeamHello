@@ -33,7 +33,6 @@ RequestHandler::Status StaticHandler::Init(const std::string& uri_prefix, const 
 RequestHandler::Status StaticHandler::HandleRequest(const Request& request, Response* response)
 {
     std::string uri_path = request.uri();
-
     std::string request_path, static_path, sfile_dir;
     std::string full_path;
     std::size_t url_found = uri_path.find(this->prefix, 0);
@@ -70,32 +69,32 @@ RequestHandler::Status StaticHandler::HandleRequest(const Request& request, Resp
             content.append(buf, is.gcount());
         response->SetStatus(Response::ok);
         //get the content type
-	      std::string extension_type = mime.extension_to_type(extension);
-	      //check if the content type is markdown. set to html
-	      if (extension_type == "text/markdown")
-		    {
-		        response->AddHeader("content-type", "text/html");
-		    }
-		    else
-		    {
+        std::string extension_type = mime.extension_to_type(extension);
+        //check if the content type is markdown. set to html
+        if (extension_type == "text/markdown")
+        {
+        response->AddHeader("content-type", "text/html");
+        }
+        else
+        {
             response->AddHeader("content-type", extension_type);
-      	    response->AddHeader("content-length", std::to_string(content.length()));
-		    }
-		    //set response body
-		    if (extension_type == "text/markdown")
-		    {
-	          markdown::Document doc;
-		        doc.read(content);
-				    std::ostringstream stream;
-				    doc.write(stream);   
-				    std::string markdown = stream.str();
-				    response->AddHeader("content-length",std::to_string(markdown.length()));
-				    response->SetBody(markdown);
-		    }
-		    else
-		    {
-		        response->SetBody(content);
-		    }
+            response->AddHeader("content-length", std::to_string(content.length()));
+        }
+        //set response body
+        if (extension_type == "text/markdown")
+        {
+            markdown::Document doc;
+            doc.read(content);
+            std::ostringstream stream;
+            doc.write(stream);   
+            std::string markdown = stream.str();
+            response->AddHeader("content-length",std::to_string(markdown.length()));
+            response->SetBody(markdown);
+        }
+        else
+        {
+            response->SetBody(content);
+        }
         return RequestHandler::Status::OK;
     }
     else if (request_path == "/")
@@ -107,4 +106,3 @@ RequestHandler::Status StaticHandler::HandleRequest(const Request& request, Resp
         return RequestHandler::Status::FILE_NOT_FOUND;
     }
 }
-
