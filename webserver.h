@@ -36,7 +36,7 @@ public:
         , WRONG_NUM_THREAD
         , MISSING_LOG_FILE_NAME
     };
-    static Server *serverBuilder(const NginxConfig& config_out);
+    static Server *serverBuilder(const NginxConfig& config_out, const std::string& config_file_name);
     void run();
     void stop();
     void getStats(std::map<std::string, int>& urlRequestedCount, std::map<std::string, int>& ResponseCodeCount);
@@ -47,7 +47,7 @@ public:
     static boost::mutex mtx;
 	
 private:
-    Server(configArguments configArgs, std::map<std::string, std::vector<std::string> > uri_prefix2request_handler_name);
+    Server(configArguments configArgs, std::map<std::string, std::vector<std::string> > uri_prefix2request_handler_name, std::string configFileName);
     void doAccept();
 
     boost::asio::io_service io_service;
@@ -55,6 +55,7 @@ private:
     boost::asio::signal_set signals;
     configArguments configContent;
     std::map<std::string, std::vector<std::string> > uri_prefix2request_handler_name;
+    std::string configFileName;
     
     static Server *serverInstance;
 };
