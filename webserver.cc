@@ -67,6 +67,9 @@ Server::Server(configArguments configArgs, std::map<std::string, std::vector<std
 
 void Server::doAccept()
 {
+    // Parse config again to reconfigure the parameters if the config
+    // file is changed
+    // This is done every time we get a new request
     NginxConfigParser config_parser;
     NginxConfig config_out;
     std::shared_ptr<session> sesh;
