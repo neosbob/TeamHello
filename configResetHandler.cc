@@ -9,7 +9,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <utility>
-#include "configTestingHandler.h"
+#include "configResetHandler.h"
 #include "webserver.h"
 
 using namespace boost;
@@ -18,12 +18,12 @@ using namespace boost::asio;
 
 class mime_types;
 
-RequestHandler::Status ConfigTestingHandler::Init(const std::string& uri_prefix, const NginxConfig& config)
+RequestHandler::Status ConfigResetHandler::Init(const std::string& uri_prefix, const NginxConfig& config)
 {
     return RequestHandler::Status::OK;
 }
 
-RequestHandler::Status ConfigTestingHandler::HandleRequest(const Request& request, Response* response)
+RequestHandler::Status ConfigResetHandler::HandleRequest(const Request& request, Response* response)
 {
     std::string body = "";
     Server* server = Server::getServerInstance();
@@ -31,13 +31,14 @@ RequestHandler::Status ConfigTestingHandler::HandleRequest(const Request& reques
     {
         return RequestHandler::FAILED;
     }
-    // Use another config file
-    server->setConfigFileName("config_demo");
-    body += "Config changed successfully!\n";
+    // Set it back to the original config file
+    server->setConfigFileName("config");
+    body += "Config reset successfully!\n";
     response->SetStatus(Response::ok);
     response->AddHeader("content-type", "text/plain");
     response->AddHeader("content-length", std::to_string(body.size()));
     response->SetBody(body);
+    
     return RequestHandler::OK;
 }
 

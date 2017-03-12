@@ -43,6 +43,7 @@ public:
     std::map<std::string, std::vector<std::string> > getUriPrefixRequestHandlerMap(){return this->uri_prefix2request_handler_name;}
     static Server *getServerInstance(){return serverInstance;}
     std::string getConfigFileName(){return configFileName;}
+    void setConfigFileName(const std::string& newName){configFileName = newName;}
     static parseConfigCode parseConfig(const NginxConfig& config_out, configArguments& configArgs, std::map<std::string, std::vector<std::string> >& uri_prefix2request_handler_name);
     static std::string constructLogMsg(std::string url, int response_code);
     static boost::mutex mtx;

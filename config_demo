@@ -31,5 +31,9 @@ path /resetConfig ConfigResetHandler {
 
 }
 
+path /static3 StaticHandler {
+  root ./test_folder;
+}
+
 # Default response handler if no handlers match.
 default NotFoundHandler {}
