@@ -92,6 +92,8 @@ void Server::doAccept()
         }
         else
         {
+            configContent = configArgs;
+            uri_prefix2request_handler_name = tmp_uri_prefix2request_handler_name;
             sesh = std::make_shared<session>(io_service, configArgs.handlerMapping, configArgs.defaultHandler, configArgs.logFileName);
         }
     }
