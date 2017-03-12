@@ -42,6 +42,7 @@ public:
     void getStats(std::map<std::string, int>& urlRequestedCount, std::map<std::string, int>& ResponseCodeCount);
     std::map<std::string, std::vector<std::string> > getUriPrefixRequestHandlerMap(){return this->uri_prefix2request_handler_name;}
     static Server *getServerInstance(){return serverInstance;}
+    std::string getConfigFileName(){return configFileName;}
     static parseConfigCode parseConfig(const NginxConfig& config_out, configArguments& configArgs, std::map<std::string, std::vector<std::string> >& uri_prefix2request_handler_name);
     static std::string constructLogMsg(std::string url, int response_code);
     static boost::mutex mtx;
