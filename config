@@ -22,5 +22,10 @@ path / ProxyHandler {
 	host ucla.edu;
 }
 
+
+path /changeConfig ConfigTestingHandler {
+
+}
+
 # Default response handler if no handlers match.
 default NotFoundHandler {}
