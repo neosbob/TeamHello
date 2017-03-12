@@ -75,6 +75,8 @@ void Server::doAccept()
     std::shared_ptr<session> sesh;
     if (!config_parser.Parse(configFileName.c_str(), &config_out))
     {
+        // If the new config file is not valid, default to the
+        // old version
         sesh = std::make_shared<session>(io_service, configContent.handlerMapping, configContent.defaultHandler, configContent.logFileName);
     }
     else
@@ -84,6 +86,8 @@ void Server::doAccept()
         parseConfigCode configParsingErrorCode = parseConfig(config_out, configArgs, tmp_uri_prefix2request_handler_name);
         if (configParsingErrorCode != Server::NO_ERROR)
         {
+            // If the new config file is not valid, default to the
+            // old version
             sesh = std::make_shared<session>(io_service, configContent.handlerMapping, configContent.defaultHandler, configContent.logFileName);
         }
         else
