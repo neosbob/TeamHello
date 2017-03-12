@@ -120,6 +120,9 @@ RequestHandler::Status CloudHandler::HandleRequest(const Request& request, Respo
     }
 }
 
+//Makes connection to cloud storage device.
+//sends request for file to cloud storage device.
+//Parses response for file, and create response for webserver using it.
 std::string CloudHandler::get_cloud_object(std::string remote_dir, std::string remote_file_path)
 {
     std::string host_url = remote_dir;
