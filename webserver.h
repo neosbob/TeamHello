@@ -36,18 +36,20 @@ public:
         , WRONG_NUM_THREAD
         , MISSING_LOG_FILE_NAME
     };
-    static Server *serverBuilder(const NginxConfig& config_out);
+    static Server *serverBuilder(const NginxConfig& config_out, const std::string& config_file_name);
     void run();
     void stop();
     void getStats(std::map<std::string, int>& urlRequestedCount, std::map<std::string, int>& ResponseCodeCount);
     std::map<std::string, std::vector<std::string> > getUriPrefixRequestHandlerMap(){return this->uri_prefix2request_handler_name;}
     static Server *getServerInstance(){return serverInstance;}
+    std::string getConfigFileName(){return configFileName;}
+    void setConfigFileName(const std::string& newName){configFileName = newName;}
     static parseConfigCode parseConfig(const NginxConfig& config_out, configArguments& configArgs, std::map<std::string, std::vector<std::string> >& uri_prefix2request_handler_name);
     static std::string constructLogMsg(std::string url, int response_code);
     static boost::mutex mtx;
 	
 private:
-    Server(configArguments configArgs, std::map<std::string, std::vector<std::string> > uri_prefix2request_handler_name);
+    Server(configArguments configArgs, std::map<std::string, std::vector<std::string> > uri_prefix2request_handler_name, std::string configFileName);
     void doAccept();
 
     boost::asio::io_service io_service;
@@ -55,6 +57,7 @@ private:
     boost::asio::signal_set signals;
     configArguments configContent;
     std::map<std::string, std::vector<std::string> > uri_prefix2request_handler_name;
+    std::string configFileName;
     
     static Server *serverInstance;
 };

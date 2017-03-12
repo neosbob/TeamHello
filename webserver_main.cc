@@ -20,8 +20,8 @@ int main(int argc, const char * argv[])
         std::cerr << "Error: failed to parse the config file.\n";
         return 2;
     }
-    
-    Server* server = Server::serverBuilder(config_out);
+    std::string configFileName = argv[1];
+    Server* server = Server::serverBuilder(config_out, configFileName);
     if (server == nullptr)
     {
         std::cerr << "Error: cannot create server due to wrong config file format.\n";

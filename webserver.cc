@@ -17,7 +17,7 @@ using namespace boost::asio;
 Server *Server::serverInstance = nullptr;
 boost::mutex Server::mtx;
 
-Server* Server::serverBuilder(const NginxConfig& config_out)
+Server* Server::serverBuilder(const NginxConfig& config_out, const std::string& config_file_name)
 {
     if (serverInstance != nullptr)
     {
@@ -30,16 +30,17 @@ Server* Server::serverBuilder(const NginxConfig& config_out)
     {
         return nullptr;
     }
-    serverInstance = new Server(configContents, uri_prefix2request_handler_name);
+    serverInstance = new Server(configContents, uri_prefix2request_handler_name, config_file_name);
     return serverInstance;
 }
 
-Server::Server(configArguments configArgs, std::map<std::string, std::vector<std::string> > uri_prefix2request_handler_name)
+Server::Server(configArguments configArgs, std::map<std::string, std::vector<std::string> > uri_prefix2request_handler_name, std::string configFileName)
 : io_service()
 , signals(io_service)
 , acceptor(io_service)
 , configContent(configArgs)
 , uri_prefix2request_handler_name(uri_prefix2request_handler_name)
+, configFileName(configFileName)
 {
     signals.add(SIGINT);
     signals.add(SIGTERM);
@@ -66,7 +67,37 @@ Server::Server(configArguments configArgs, std::map<std::string, std::vector<std
 
 void Server::doAccept()
 {
-    std::shared_ptr<session> sesh = std::make_shared<session>(io_service, configContent.handlerMapping, configContent.defaultHandler, configContent.logFileName);
+    // Parse config again to reconfigure the parameters if the config
+    // file is changed
+    // This is done every time we get a new request
+    NginxConfigParser config_parser;
+    NginxConfig config_out;
+    std::shared_ptr<session> sesh;
+    if (!config_parser.Parse(configFileName.c_str(), &config_out))
+    {
+        // If the new config file is not valid, default to the
+        // old version
+        sesh = std::make_shared<session>(io_service, configContent.handlerMapping, configContent.defaultHandler, configContent.logFileName);
+    }
+    else
+    {
+        configArguments configArgs;
+        std::map<std::string, std::vector<std::string> > tmp_uri_prefix2request_handler_name;
+        parseConfigCode configParsingErrorCode = parseConfig(config_out, configArgs, tmp_uri_prefix2request_handler_name);
+        if (configParsingErrorCode != Server::NO_ERROR)
+        {
+            // If the new config file is not valid, default to the
+            // old version
+            sesh = std::make_shared<session>(io_service, configContent.handlerMapping, configContent.defaultHandler, configContent.logFileName);
+        }
+        else
+        {
+            configContent = configArgs;
+            uri_prefix2request_handler_name = tmp_uri_prefix2request_handler_name;
+            sesh = std::make_shared<session>(io_service, configArgs.handlerMapping, configArgs.defaultHandler, configArgs.logFileName);
+        }
+    }
+    
     acceptor.async_accept(sesh->socket, [sesh, this](const error_code& accept_error)
     {
         if(!accept_error)
