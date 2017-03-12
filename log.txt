@@ -1,15 +1,3 @@
 New request:
-url requested:/cloud/cs130-assign9/s3.txt
-Response code:200
-New request:
-url requested:
-Response code:404
-New request:
-url requested:/cloud/cs130-assign9/Building.jpg
-Response code:200
-New request:
-url requested:/cloud/cs130-assign9/Fish.jpg
-Response code:200
-New request:
-url requested:/cloud/cs130-assign9/Fisha.jpg
+url requested:/cloud/cs130-assign9/Pond.JPG
 Response code:200

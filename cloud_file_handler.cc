@@ -72,7 +72,11 @@ RequestHandler::Status CloudHandler::HandleRequest(const Request& request, Respo
         if(response_status == "HTTP/1.1 200 OK\r\n")
             response->SetStatus(Response::ok);
         else if (response_status == "HTTP/1.1 404 Not Found\r\n")
-	     response->SetStatus(Response::not_found);
+	    response->SetStatus(Response::not_found);
+        else if (response_status == "HTTP/1.1 403 Forbidden\r\n")
+	    response->SetStatus(Response::forbidden);
+	else
+	    return RequestHandler::Status::FAILED;
         //get the content type
         std::string extension_type = mime.extension_to_type(extension);
         //check if the content type is markdown. set to html
