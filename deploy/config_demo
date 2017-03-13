@@ -22,6 +22,9 @@ path / ProxyHandler {
 	host ucla.edu;
 }
 
+path /cloud CloudHandler {
+  root s3-us-west-1.amazonaws.com;
+}
 
 path /changeConfig ConfigTestingHandler {
 
