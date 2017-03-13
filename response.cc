@@ -21,6 +21,8 @@ namespace status_string
 {  
   const std::string ok =
   "HTTP/1.1 200 OK\r\n";
+  const std::string forbidden =
+  "HTTP/1.1 403 Forbidden\r\n";  
   const std::string not_found =
   "HTTP/1.1 404 Not Found\r\n";
   const std::string int_serv_err =
@@ -34,6 +36,9 @@ void Response::SetStatus(const ResponseCode response_code)
     {
         case Response::ok:
             this->response_status_string = status_string::ok;
+            break;
+	case Response::forbidden:
+            this->response_status_string = status_string::forbidden;
             break;
         case Response::not_found:
             this->response_status_string = status_string::not_found;
