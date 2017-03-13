@@ -1,8 +1,6 @@
 import httplib
-import filecmp
 
 HOSTNAME = "54.201.90.157"
-
 
 def testCase():
     connection1 = httplib.HTTPConnection(HOSTNAME)
@@ -17,10 +15,9 @@ def testCase():
     if expected_body == body1:
         print "Case passed!"
     else:
-        print "Case failed!".format
+        print "Case failed!"
     connection1.close()
     connection2.close()
-    
 
 def main():
     testCase()
