@@ -19,10 +19,10 @@ deploy: deploy/Dockerfile.run deploy/webserver.tar
 	#This builds the shruken image.
 	cd deploy && docker build -f Dockerfile.run -t webserver.deploy .
 	#The following copies the image to the AWS-ec2
-	docker save webserver.deploy | bzip2 | pv | ssh -i CS130-TeamHello-Assign8-ec2.pem ec2-user@ec2-54-201-90-157.us-west-2.compute.amazonaws.com 'bunzip2 | docker load'
+	docker save webserver.deploy | bzip2 | pv | ssh -i "Bob-test-server.pem" ubuntu@ec2-52-15-233-207.us-east-2.compute.amazonaws.com 'bunzip2 | docker load'
 	#The following runs make using the new image on AWS-ec2 server
-	ssh -i CS130-TeamHello-Assign8-ec2.pem ec2-user@ec2-54-201-90-157.us-west-2.compute.amazonaws.com 'make deploy'
-
+	#ssh -i "Bob-test-server.pem" ubuntu@ec2-52-15-233-207.us-east-2.compute.amazonaws.com 'make deploy'
+	ssh -i "Bob-test-server.pem" ubuntu@ec2-52-15-233-207.us-east-2.compute.amazonaws.com 'docker stop $$(docker ps -a -q) && docker run -d -t -p 80:8080 webserver.deploy'
 cloud_file_handler.o: cloud_file_handler.cc cloud_file_handler.h request_handler.h mime_types.h mime_types.cc response.cc response.h request.cc request.h
 	g++ -c -std=c++11 cloud_file_handler.cc -lboost_system
 
