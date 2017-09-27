@@ -1,4 +1,4 @@
-FROM busybox:ubuntu-14.04
+FROM php:7.0-cli
 
 WORKDIR /opt/webserver
 COPY . /opt/webserver
