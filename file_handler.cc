@@ -48,7 +48,7 @@ std::string parse_Qstring(std::string query_string) {
 
     std::string final_string = o_string + fix_comment;
 
-    return final_string;
+    return s;
 }
 
 RequestHandler::Status StaticHandler::Init(const std::string& uri_prefix, const NginxConfig& config)
